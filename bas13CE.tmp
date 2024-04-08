@@ -1,0 +1,48 @@
+[gd_scene load_steps=5 format=3 uid="uid://cg5veugy1y3ty"]
+
+[ext_resource type="Script" path="res://base_tile.gd" id="1_duytr"]
+[ext_resource type="Texture2D" uid="uid://2gr6jmjp82a8" path="res://sprites/base.png" id="1_xssth"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_pe3ns"]
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_1hfdd"]
+font_size = 80
+font_color = Color(0, 0, 0, 1)
+
+[node name="BaseTile" type="TextureButton"]
+offset_right = 160.0
+offset_bottom = 160.0
+script = ExtResource("1_duytr")
+
+[node name="BaseTileTexture" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.131
+anchor_right = -0.131
+offset_left = 20.96
+offset_right = 180.96
+offset_bottom = 160.0
+texture = ExtResource("1_xssth")
+
+[node name="PointValue" type="Label" parent="."]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 10.0
+offset_right = 150.0
+offset_bottom = 35.0
+text = "1"
+label_settings = SubResource("LabelSettings_pe3ns")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Character" type="Label" parent="."]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 130.0
+offset_bottom = 130.0
+text = "B"
+label_settings = SubResource("LabelSettings_1hfdd")
+horizontal_alignment = 1
+vertical_alignment = 1
