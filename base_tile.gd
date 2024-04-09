@@ -1,4 +1,4 @@
-class_name BaseTile extends Node2D
+class_name BaseTile extends Control
 
 func init_class(char, val):
 	$Character.text = char
