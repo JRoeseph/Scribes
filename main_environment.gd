@@ -8,7 +8,7 @@ var temp = false;
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# Addition of random cells for testing
-	for n in range(12):
+	for n in range(16):
 		rack_tiles.push_back(_temp_generate_random_tile())
 		add_child(rack_tiles[n])
 	render_tiles()
@@ -16,11 +16,6 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	# Possible idea for how to handle animations: Have a dict that stores a reference
-	# to whatever variable is being animated, the starting and final values, the
-	# total time for animation, and time elapsed. Then do math to update values
-	# in process. This is assuming that Godot doesn't have any built-in ways to do
-	# this
 	# Animation for Tile Dragging
 	if grabbed_tile != null:
 		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
@@ -49,9 +44,26 @@ func render_tiles():
 	var scale: float = 1
 	if count > 12:
 		scale = 12.0/(ceil(count/4.0)*4.0)
-		tween.tween_property(get_node("Rack/RackTexture"), "scale", Vector2(scale,scale), 0.2)
-		tween.tween_property(get_node("Rack/RackTexture"), "position.y", 1080-200*scale, 0.2)
-		tween.tween_property(get_node("Rack/RackTexture"), "size.x", 1920*(1/scale), 0.2)
+		tween.parallel().tween_property(get_node("Rack/RackTexture"), "scale", Vector2(scale,scale), 0.2)
+		tween.parallel().tween_property(get_node("Rack/RackTexture"), "position", Vector2(0,1080-200*scale), 0.2)
+		tween.parallel().tween_property(get_node("Rack/RackTexture"), "size", Vector2(1920*(1/scale),200), 0.2)
+		if rack_tiles.size() == 0:
+			return
+		if get_viewport().get_mouse_position().y > 780 && grabbed_tile != null && hover_index != -1:
+			var space_per_tile: float = 1920/count
+			var left_space: float = (space_per_tile)/2-75
+			var rack_index: int = 0
+			for n in range(count):
+				if hover_index != n:
+					tween.parallel().tween_property(rack_tiles[rack_index], "position", Vector2(left_space+space_per_tile*n,1080-(80+120*scale)), 0.2)
+					tween.parallel().tween_property(rack_tiles[rack_index], "scale", Vector2(scale,scale), 0.2)
+					rack_index += 1
+		else:
+			var space_per_tile: float = 1920/rack_tiles.size()
+			var left_space: float = (space_per_tile)/2-75
+			for n: int in range(rack_tiles.size()):
+				tween.parallel().tween_property(rack_tiles[n], "position", Vector2(left_space+space_per_tile*n,1080-(80+120*scale)), 0.2)
+				tween.parallel().tween_property(rack_tiles[n], "scale", Vector2(scale,scale), 0.2)
 	else:
 		if rack_tiles.size() == 0:
 			return
@@ -61,18 +73,18 @@ func render_tiles():
 			var rack_index: int = 0
 			for n in range(count):
 				if hover_index != n:
-					tween.parallel().tween_property(rack_tiles[rack_index], "position", Vector2(left_space+space_per_tile*n,875), 0.2)
+					tween.parallel().tween_property(rack_tiles[rack_index], "position", Vector2(left_space+space_per_tile*n,1080-(80+120*scale)), 0.2)
 					rack_index += 1
 		else:
 			var space_per_tile: float = 1920/rack_tiles.size()
 			var left_space: float = (space_per_tile)/2-75
-			for n in range(rack_tiles.size()):
-				tween.parallel().tween_property(rack_tiles[n], "position", Vector2(left_space+space_per_tile*n,875), 0.2)
+			for n: int in range(rack_tiles.size()):
+				tween.parallel().tween_property(rack_tiles[n], "position", Vector2(left_space+space_per_tile*n,1080-(80+120*scale)), 0.2)
 		
 var possible_chars = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 var rng = RandomNumberGenerator.new()
 func _temp_generate_random_tile():
-	var base_tile = base_tile_scene.instantiate()
+	var base_tile: BaseTile = base_tile_scene.instantiate()
 	base_tile.default_init(possible_chars[rng.randi_range(0,25)])
 	return base_tile
 
@@ -87,19 +99,16 @@ func _input(event: InputEvent):
 					break
 		elif event.button_index == MouseButton.MOUSE_BUTTON_LEFT && \
 			!event.pressed && grabbed_tile != null:
-			if hover_index == -1:
-				rack_tiles.push_back(grabbed_tile)
-			else:
-				rack_tiles.insert(hover_index, grabbed_tile)
+			var space_per_tile: float = 1920/(rack_tiles.size()+1)
+			var new_hover_index: int = floori(get_viewport().get_mouse_position().x/space_per_tile)
+			rack_tiles.insert(new_hover_index, grabbed_tile)
 			grabbed_tile.rotation = 0
 			grabbed_tile = null
 			render_tiles()
 	elif event is InputEventMouseMotion:
 		if get_viewport().get_mouse_position().y > 780 && grabbed_tile != null:
-			var space_per_tile = 1920/(rack_tiles.size()+1)
-			var new_hover_index = floori(get_viewport().get_mouse_position().x/space_per_tile)
-			if temp:
-				var RAWR
+			var space_per_tile: float = 1920/(rack_tiles.size()+1)
+			var new_hover_index: int = floori(get_viewport().get_mouse_position().x/space_per_tile)
 			if new_hover_index != hover_index:
 				hover_index = new_hover_index
 				render_tiles()
@@ -107,3 +116,7 @@ func _input(event: InputEvent):
 			temp = true
 			hover_index = -1
 			render_tiles()
+	elif event is InputEventKey:
+		match(event.physical_keycode):
+			KEY_ESCAPE:
+				get_tree().quit()

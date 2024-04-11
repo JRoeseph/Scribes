@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://c3gb2cctauxn6"]
+[gd_scene load_steps=4 format=3 uid="uid://c3gb2cctauxn6"]
 
 [ext_resource type="Script" path="res://main_environment.gd" id="1_t0f1m"]
 [ext_resource type="Texture2D" uid="uid://dja40jeowujym" path="res://sprites/Rack.png" id="2_t34q5"]
+[ext_resource type="Script" path="res://Board.gd" id="3_ybnbn"]
 
 [node name="MainEnvironment" type="Node2D"]
 script = ExtResource("1_t0f1m")
@@ -17,8 +18,12 @@ layout_mode = 0
 offset_top = 880.0
 offset_right = 1920.0
 offset_bottom = 1080.0
+scale = Vector2(1.01, 1.01)
 size_flags_horizontal = 3
 size_flags_vertical = 4
 texture = ExtResource("2_t34q5")
 expand_mode = 1
 stretch_mode = 1
+
+[node name="Board" type="Node2D" parent="."]
+script = ExtResource("3_ybnbn")
