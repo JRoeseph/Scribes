@@ -1,10 +1,24 @@
 class_name MainEnvironment extends Node2D
-var base_tile_scene: PackedScene = load("res://base_tile.tscn")
+var base_tile_scene: PackedScene = load("res://scenes/base_tile.tscn")
 
 var grabbed_tile: BaseTile
 var rack_tiles: Array = []
 var hover_index: int = -1
 var temp = false;
+
+func set_grabbed_tile(tile: BaseTile):
+	rack_tiles.erase(tile)
+	grabbed_tile = tile
+	render_tiles()
+	
+func drop_grabbed_tile():
+	var space_per_tile: float = 1920/(rack_tiles.size()+1)
+	var new_hover_index: int = floori(get_viewport().get_mouse_position().x/space_per_tile)
+	rack_tiles.insert(new_hover_index, grabbed_tile)
+	grabbed_tile.rotation = 0
+	grabbed_tile = null
+	render_tiles()
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# Addition of random cells for testing
@@ -89,23 +103,7 @@ func _temp_generate_random_tile():
 	return base_tile
 
 func _input(event: InputEvent):
-	if event is InputEventMouseButton:
-		if event.button_index == MouseButton.MOUSE_BUTTON_LEFT && event.pressed:
-			for tile: BaseTile in rack_tiles:
-				if tile.get_rect().has_point(event.position):
-					grabbed_tile = tile
-					rack_tiles.erase(tile)
-					render_tiles()
-					break
-		elif event.button_index == MouseButton.MOUSE_BUTTON_LEFT && \
-			!event.pressed && grabbed_tile != null:
-			var space_per_tile: float = 1920/(rack_tiles.size()+1)
-			var new_hover_index: int = floori(get_viewport().get_mouse_position().x/space_per_tile)
-			rack_tiles.insert(new_hover_index, grabbed_tile)
-			grabbed_tile.rotation = 0
-			grabbed_tile = null
-			render_tiles()
-	elif event is InputEventMouseMotion:
+	if event is InputEventMouseMotion:
 		if get_viewport().get_mouse_position().y > 780 && grabbed_tile != null:
 			var space_per_tile: float = 1920/(rack_tiles.size()+1)
 			var new_hover_index: int = floori(get_viewport().get_mouse_position().x/space_per_tile)

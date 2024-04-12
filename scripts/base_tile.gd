@@ -1,4 +1,4 @@
-class_name BaseTile extends Control
+class_name BaseTile extends Button
 
 func init_class(char, val):
 	$Character.text = char
@@ -22,3 +22,9 @@ var default_vals = {"A":1,"B":3,"C":3,"D":2,"E":1,"F":4, \
 					"S":1,"T":1,"U":1,"V":4,"W":4,"X":8,"Y":4,"Z":10}
 func get_default_value(char):
 	return default_vals[char]
+
+func _on_button_down():
+	get_parent().set_grabbed_tile(self)
+
+func _on_button_up():
+	get_parent().drop_grabbed_tile()
