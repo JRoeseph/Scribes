@@ -1,11 +1,112 @@
+class_name Board 
 extends Node2D
+## This class stores the information and renders the board
+##
+## This class stores a 2d array of all the board spaces, which in turn store
+## the tiles on the grid
 
+var BoardSpace: PackedScene = load("res://scenes/board_space.tscn")
 
-# Called when the node enters the scene tree for the first time.
+# The 2d array that stores the BoardSpaces
+var spaces: Array = [] :
+	get:
+		return spaces
+	set(value):
+		spaces = value
+# The power of 1.1 that the spaces zoom to (default size of 180x180
+var zoom_factor: int = 0 :
+	get:
+		return zoom_factor
+	set(value):
+		zoom_factor = value
+# The position of the top-left tile on the board
+var top_left_pos: Vector2 = Vector2(0,0) :
+	get:
+		return top_left_pos
+	set(value):
+		top_left_pos = value
+
+## Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	for x: int in range(15):
+		spaces.push_back([])
+		for y: int in range(15):
+			var board_space: BoardSpace = BoardSpace.instantiate()
+			add_child(board_space)
+			spaces[x].push_back(board_space)
+	build_board()
 
+## Builds the initial conditions for the board to be built
+## TODO: Andy corrects this in the resolution change
+func build_board():
+	var x_scale: float = 1920.0 / (spaces.size() * 180.0)
+	var y_scale: float = 1080.0 / (spaces[0].size() * 180.0)
+	var new_scale: float = x_scale if x_scale < y_scale else y_scale
+	zoom_factor = round(log(new_scale) / log(1.1))
+	var x_offset: float = (1920.0 - (spaces.size() * 180.0) * new_scale) / 2
+	var y_offset: float = (1080.0 - (spaces[0].size() * 180.0) * new_scale) / 2
+	anim_render_board(Vector2(x_offset, y_offset))
+	top_left_pos = Vector2(x_offset, y_offset)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+## Animates the board to its new position and size
+func anim_render_board(starting_pos: Vector2):
+	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
+	var current_scale: float = pow(1.1, zoom_factor)
+	for x: int in range(spaces.size()):
+		for y: int in range(spaces[0].size()):
+			tween.parallel().tween_property(spaces[x][y], 
+					"scale", Vector2(current_scale, current_scale), 0.2)
+			tween.parallel().tween_property(spaces[x][y], 
+					"position", 
+					Vector2(starting_pos.x + 180 * current_scale * x, 
+							starting_pos.y + 180 * current_scale * y), 
+					0.2)
+
+## Returns the board space the mouse cursor is over, returns null if none
+func find_hover_space() -> BoardSpace:
+	var abs_tl = self.position + top_left_pos
+	var current_scale: float = pow(1.1, zoom_factor)
+	var board_rect: Rect2 = Rect2(abs_tl,
+		Vector2(abs_tl.x + spaces.size() * 180 * current_scale,
+				abs_tl.y + spaces[0].size() * 180 * current_scale))
+	if board_rect.has_point(get_global_mouse_position()):
+		var rel_mou_pos: Vector2 = get_global_mouse_position() - abs_tl
+		var x: int = floori(rel_mou_pos.x / (180 * current_scale))
+		var y: int = floori(rel_mou_pos.y / (180 * current_scale))
+		if x < 0 || y < 0 || x >= spaces.size() || y >= spaces[0].size():
+			return null
+		return spaces[x][y]
+	return null
+
+## Captures input for handling interactions with the board
+func _input(event: InputEvent):
+	if event is InputEventMouseMotion:
+		if event.get_pressure() == 1 && get_parent().grabbed_tile == null:
+			self.position += event.relative
+		elif event.get_pressure() == 1:
+			var hover_space: BoardSpace = find_hover_space()
+			get_parent().hover_space = hover_space
+	elif event is InputEventMouseButton:
+		match(event.button_index):
+			MOUSE_BUTTON_WHEEL_UP:
+				if get_parent().grabbed_tile == null:
+					zoom_factor += 1
+					var current_scale: float = pow(1.1, zoom_factor)
+					var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
+							- get_global_mouse_position())
+					var offset: Vector2 = (mouse_to_topleft_pos * 1.1) - mouse_to_topleft_pos
+					top_left_pos += offset
+					anim_render_board(top_left_pos)
+			MOUSE_BUTTON_WHEEL_DOWN:
+				if get_parent().grabbed_tile == null:
+					zoom_factor -= 1
+					var current_scale: float = pow(1.1, zoom_factor)
+					var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
+							- get_global_mouse_position())
+					var offset: Vector2 = (mouse_to_topleft_pos / (1.1)) - mouse_to_topleft_pos
+					top_left_pos += offset
+					anim_render_board(top_left_pos)
+
+## Returns the absolute position relative to the window of a specific space
+func get_space_abs_pos(space: BoardSpace) -> Vector2:
+	return space.position + position + Vector2(1, 1) * 90 * pow(1.1, zoom_factor)
