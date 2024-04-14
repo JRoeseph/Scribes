@@ -32,8 +32,8 @@ var top_left_pos: Vector2 = Vector2(0,0) :
 # The size of the contents of the board
 var board_size: Vector2 :
 	get:
-		return Vector2(spaces.size()*180*pow(1.1,zoom_factor),
-				spaces[0].size()*180*pow(1.1,zoom_factor))
+		return Vector2(spaces.size() * 180 * pow(1.1, zoom_factor),
+				spaces[0].size() * 180 * pow(1.1, zoom_factor))
 	set(value):
 		push_error("Board.board_size is strictly a read-only value")
 # The coordinates of the center space for the board. Stored since it will move as the board expands
@@ -95,19 +95,24 @@ func find_hover_space() -> BoardSpace:
 		return spaces[x][y]
 	return null
 
+## Ensures any part of the board is in the center of the screen by making it so the edges can't
+## go across the center in the opposite direction
+func ensure_board_centered():
+	if self.position.x + top_left_pos.x + board_size.x < WINDOW_WIDTH/2:
+		self.position.x = WINDOW_WIDTH/2 - top_left_pos.x - board_size.x
+	elif self.position.x + top_left_pos.x > WINDOW_WIDTH/2:
+		self.position.x = WINDOW_WIDTH/2 - top_left_pos.x
+	if self.position.y + top_left_pos.y + board_size.y < WINDOW_HEIGHT/2:
+		self.position.y = WINDOW_HEIGHT/2 - top_left_pos.y - board_size.y
+	elif self.position.y + top_left_pos.y > WINDOW_HEIGHT/2:
+		self.position.y = WINDOW_HEIGHT/2 - top_left_pos.y
+
 ## Captures input for handling interactions with the board
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion:
 		if event.get_pressure() == 1 && get_parent().grabbed_tile == null:
 			self.position += event.relative
-			if self.position.x + top_left_pos.x + board_size.x < WINDOW_WIDTH/2:
-				self.position.x = WINDOW_WIDTH/2 - top_left_pos.x - board_size.x
-			elif self.position.x + top_left_pos.x > WINDOW_WIDTH/2:
-				self.position.x = WINDOW_WIDTH/2 - top_left_pos.x
-			if self.position.y + top_left_pos.y + board_size.y < WINDOW_HEIGHT/2:
-				self.position.y = WINDOW_HEIGHT/2 - top_left_pos.y - board_size.y
-			elif self.position.y + top_left_pos.y > WINDOW_HEIGHT/2:
-				self.position.y = WINDOW_HEIGHT/2 - top_left_pos.y
+			ensure_board_centered()
 		elif event.get_pressure() == 1:
 			var hover_space: BoardSpace = find_hover_space()
 			if hover_space == null || hover_space.placed_tile != null:
