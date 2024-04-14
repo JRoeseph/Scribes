@@ -5,14 +5,14 @@ extends Node2D
 ## This environment is specifically for the board, placement, etc. It will handle
 ## tiles, dragging, placing, storing the contents, calculating score, and round information
 
-var BaseTile: PackedScene = load("res://scenes/base_tile.tscn")
+var BaseRenderTile: PackedScene = load("res://scenes/base_render_tile.tscn")
 
 # TODO: replace these around the project with whatever system Andy is gonna use for resolution
 var WINDOW_WIDTH: float = 1920.0
 var WINDOW_HEIGHT: float = 1080.0
 
 ## The tile being dragged by the user. null if none is active
-var grabbed_tile: BaseTile = null:
+var grabbed_tile: BaseRenderTile = null:
 	get:
 		return grabbed_tile
 	set(value):
@@ -49,9 +49,15 @@ var grab_tile_hover_tween: Tween = null :
 		return grab_tile_hover_tween
 	set(value):
 		grab_tile_hover_tween = value
+## The object that stores the player data for the run
+var player: Player = null :
+	get:
+		return player
+	set(value):
+		player = value
 
 ## Called when a child BaseTile is clicked 
-func tile_pressed(tile: BaseTile) -> void:
+func tile_pressed(tile: BaseRenderTile) -> void:
 	grabbed_tile = tile
 
 ## Animation function for locking the grabbed_tile to the grid
@@ -172,7 +178,7 @@ var possible_chars: Array = [
 ]
 var rng = RandomNumberGenerator.new()
 func _temp_generate_random_tile():
-	var base_tile: BaseTile = BaseTile.instantiate()
+	var base_tile: BaseRenderTile = BaseRenderTile.instantiate()
 	base_tile.default_init(possible_chars[rng.randi_range(0,25)])
 	return base_tile
 

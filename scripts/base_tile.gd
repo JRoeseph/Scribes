@@ -1,29 +1,69 @@
-class_name BaseTile 
-extends Button
-## This class is the basis for all the tiles in the game
+class_name BaseTile
+## The class for the tile data
 ##
-## This class handles the rendering and storage of all the information a tile has
+## This class stores the shape, color, font, character, and value of a given tile
+## as well as the enums for those values, and any other methods necessary
 
+## The valid shapes for Tiles
+enum TileShape {
+	Basic,
+	half,
+	large,
+	arrow,
+	star,
+}
+## The valid colors for tiles
+enum TileColor {
+	Basic,
+	Red,
+	Orange,
+	Yellow,
+	Green,
+	Blue,
+	Purple,
+	Black,
+	Amber,
+}
+## The valid fonts for tiles
+enum TileFont {
+	Basic,
+	ASCII,
+	ComicSans,
+	TimesNewRoman,
+	Arial,
+}
 
-## Called when the class is initialized
-func init_class(char, val) -> BaseTile:
-	$Character.text = char
-	$Value.text = val
-	return self
+## The shape of the tile object
+var shape: TileShape = TileShape.Basic :
+	get:
+		return shape
+	set(value):
+		shape = value
+## The color of the tile object
+var color: TileColor = TileColor.Basic :
+	get:
+		return color
+	set(value):
+		color = value
+## The font of the tile object
+var font: TileFont = TileFont.Basic :
+	get:
+		return font
+	set(value):
+		font = value
+## The character(s) of the tile object
+var character: String = "" :
+	get:
+		return character
+	set(value):
+		character = value
+## The value of the tile object
+var value: float = 0 :
+	get:
+		return value
+	set(val):
+		value = val
 
-## Initializes the class with default values according to Scrababa
-func default_init(char) -> BaseTile:
-	$Character.text = char
-	$Value.text = str(get_default_value(char))
-	return self
-
-var default_vals = {"A":1,"B":3,"C":3,"D":2,"E":1,"F":4,
-					"G":2,"H":4,"I":1,"J":8,"K":5,"L":1,
-					"M":3,"N":1,"O":1,"P":3,"Q":10,"R":1,
-					"S":1,"T":1,"U":1,"V":4,"W":4,"X":8,"Y":4,"Z":10}
-func get_default_value(char):
-	return default_vals[char]
-
-## Called when a tile is clicked
-func _on_button_down() -> void:
-	get_parent().tile_pressed(self)
+func _init(char: String, val: float) -> void:
+	character = char
+	value = val

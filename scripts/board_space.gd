@@ -6,7 +6,7 @@ extends Control
 ## at the end of a turn, and can release them if not locked
 
 ## The tile placed on this space. Null if none
-var placed_tile: BaseTile = null :
+var placed_tile: BaseRenderTile = null :
 	get:
 		return placed_tile
 	set(value):
@@ -19,14 +19,14 @@ var is_locked: bool = false :
 		is_locked = value
 
 ## Called when the tile on the BoardSpace is pressed
-func tile_pressed(tile: BaseTile) -> void:
+func tile_pressed(tile: BaseRenderTile) -> void:
 	if !is_locked:
 		remove_child(placed_tile)
 		get_parent().get_parent().grabbed_tile = tile
 		placed_tile = null
 
 ## Places a tile into this space
-func place_tile(tile: BaseTile) -> void:
+func place_tile(tile: BaseRenderTile) -> void:
 	placed_tile = tile
 	add_child(placed_tile)
 	get_parent().get_parent().grab_tile_hover_tween.kill()
