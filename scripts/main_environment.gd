@@ -193,7 +193,7 @@ func _input(event: InputEvent):
 			if new_hover_index != hover_index:
 				hover_index = new_hover_index
 				anim_render_rack()
-		elif hover_index != -1 &&get_viewport().get_mouse_position().y <= $Rack.position.y:
+		elif hover_index != -1 && get_viewport().get_mouse_position().y <= $Rack.position.y:
 			hover_index = -1
 			anim_render_rack()
 	elif event is InputEventMouseButton:
