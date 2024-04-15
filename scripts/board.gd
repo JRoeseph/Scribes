@@ -11,37 +11,45 @@ var BoardSpace: PackedScene = load("res://scenes/board_space.tscn")
 var WINDOW_WIDTH: float = 1920.0
 var WINDOW_HEIGHT: float = 1080.0
 
-# The 2d array that stores the BoardSpaces
+var ZOOM_FACTOR_MIN: int = -25
+var ZOOM_FACTOR_MAX: int = 7
+
+## The 2d array that stores the BoardSpaces
 var spaces: Array = [] :
 	get:
 		return spaces
 	set(value):
 		spaces = value
-# The power of 1.1 that the spaces zoom to (default size of 180x180
+		
+## The power of 1.1 that the spaces zoom to (default size of 180x180
 var zoom_factor: int = 0 :
 	get:
 		return zoom_factor
 	set(value):
 		zoom_factor = value
-# The position of the top-left tile on the board
+		
+## The position of the top-left tile on the board
 var top_left_pos: Vector2 = Vector2(0,0) :
 	get:
 		return top_left_pos
 	set(value):
 		top_left_pos = value
-# The size of the contents of the board
+		
+## The size of the contents of the board
 var board_size: Vector2 :
 	get:
 		return Vector2(spaces.size() * 180 * pow(1.1, zoom_factor),
 				spaces[0].size() * 180 * pow(1.1, zoom_factor))
 	set(value):
 		push_error("Board.board_size is strictly a read-only value")
-# The coordinates of the center space for the board. Stored since it will move as the board expands
+		
+## The coordinates of the center space for the board. Stored since it will move as the board expands
 var center_coords: Vector2i = Vector2i(7,7) :
 	get:
 		return center_coords
 	set(value):
 		center_coords = value
+
 
 ## Called when the node enters the scene tree for the first time.
 func _ready():
@@ -52,6 +60,7 @@ func _ready():
 			add_child(board_space)
 			spaces[x].push_back(board_space)
 	build_board()
+
 
 ## Builds the initial conditions for the board to be built
 ## TODO: Andy corrects this in the resolution change
@@ -64,6 +73,7 @@ func build_board():
 	var y_offset: float = (WINDOW_HEIGHT - (spaces[0].size() * 180.0) * new_scale) / 2
 	anim_render_board(Vector2(x_offset, y_offset))
 	top_left_pos = Vector2(x_offset, y_offset)
+
 
 ## Animates the board to its new position and size
 func anim_render_board(starting_pos: Vector2):
@@ -78,6 +88,7 @@ func anim_render_board(starting_pos: Vector2):
 					Vector2(starting_pos.x + 180 * current_scale * x, 
 							starting_pos.y + 180 * current_scale * y), 
 					0.2)
+
 
 ## Returns the board space the mouse cursor is over, returns null if none
 func find_hover_space() -> BoardSpace:
@@ -95,17 +106,19 @@ func find_hover_space() -> BoardSpace:
 		return spaces[x][y]
 	return null
 
+
 ## Ensures any part of the board is in the center of the screen by making it so the edges can't
 ## go across the center in the opposite direction
 func ensure_board_centered():
-	if self.position.x + top_left_pos.x + board_size.x < WINDOW_WIDTH/2:
-		self.position.x = WINDOW_WIDTH/2 - top_left_pos.x - board_size.x
-	elif self.position.x + top_left_pos.x > WINDOW_WIDTH/2:
-		self.position.x = WINDOW_WIDTH/2 - top_left_pos.x
+	if self.position.x + top_left_pos.x + board_size.x < WINDOW_WIDTH / 2:
+		self.position.x = WINDOW_WIDTH / 2 - top_left_pos.x - board_size.x
+	elif self.position.x + top_left_pos.x > WINDOW_WIDTH / 2:
+		self.position.x = WINDOW_WIDTH / 2 - top_left_pos.x
 	if self.position.y + top_left_pos.y + board_size.y < WINDOW_HEIGHT/2:
-		self.position.y = WINDOW_HEIGHT/2 - top_left_pos.y - board_size.y
-	elif self.position.y + top_left_pos.y > WINDOW_HEIGHT/2:
-		self.position.y = WINDOW_HEIGHT/2 - top_left_pos.y
+		self.position.y = WINDOW_HEIGHT / 2 - top_left_pos.y - board_size.y
+	elif self.position.y + top_left_pos.y > WINDOW_HEIGHT / 2:
+		self.position.y = WINDOW_HEIGHT / 2 - top_left_pos.y
+
 
 ## Captures input for handling interactions with the board
 func _input(event: InputEvent):
@@ -122,7 +135,7 @@ func _input(event: InputEvent):
 	elif event is InputEventMouseButton:
 		match(event.button_index):
 			MOUSE_BUTTON_WHEEL_UP:
-				if get_parent().grabbed_tile == null && zoom_factor < 7:
+				if get_parent().grabbed_tile == null && zoom_factor < ZOOM_FACTOR_MAX:
 					zoom_factor += 1
 					var current_scale: float = pow(1.1, zoom_factor)
 					var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
@@ -131,7 +144,7 @@ func _input(event: InputEvent):
 					top_left_pos += offset
 					anim_render_board(top_left_pos)
 			MOUSE_BUTTON_WHEEL_DOWN:
-				if get_parent().grabbed_tile == null && zoom_factor > -25:
+				if get_parent().grabbed_tile == null && zoom_factor > ZOOM_FACTOR_MIN:
 					zoom_factor -= 1
 					var current_scale: float = pow(1.1, zoom_factor)
 					var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
@@ -139,6 +152,7 @@ func _input(event: InputEvent):
 					var offset: Vector2 = (mouse_to_topleft_pos / (1.1)) - mouse_to_topleft_pos
 					top_left_pos += offset
 					anim_render_board(top_left_pos)
+
 
 ## Returns the absolute position relative to the window of a specific space
 func get_space_abs_pos(space: BoardSpace) -> Vector2:

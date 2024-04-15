@@ -26,14 +26,17 @@ var grabbed_tile: BaseRenderTile = null:
 		else:
 			rack_tiles.erase(value)
 			anim_render_rack()
+
 ## The array of tiles present on the rack. Does not contain the tile being dragged
 var rack_tiles: Array = [] :
 	get:
 		return rack_tiles
 	set(value):
 		rack_tiles = value
+
 ## The index in rack_tiles grabbed_tile would be placed if let go. Based on grabbed_tile's position
 var hover_index: int = -1
+
 ## The BoardSpace the cursor is currently over
 var hover_space: BoardSpace = null :
 	get:
@@ -42,6 +45,7 @@ var hover_space: BoardSpace = null :
 		if value != hover_space:
 			hover_space = value
 			anim_grab_tile_to_hover()
+
 ## The tween for handling the animation for hovering over tiles. Needs to be stored so it can
 ## be killed externally if necessary
 var grab_tile_hover_tween: Tween = null :
@@ -56,9 +60,11 @@ var player: Player = null :
 	set(value):
 		player = value
 
+
 ## Called when a child BaseTile is clicked 
 func tile_pressed(tile: BaseRenderTile) -> void:
 	grabbed_tile = tile
+
 
 ## Animation function for locking the grabbed_tile to the grid
 func anim_grab_tile_to_hover(is_instant: bool = false) -> void:
@@ -81,10 +87,11 @@ func anim_grab_tile_to_hover(is_instant: bool = false) -> void:
 		grab_tile_hover_tween.parallel().tween_property(grabbed_tile, "rotation", 
 				0, duration)
 
+
 ## Called when the left-mouse button is released and grabbed_tile is not null
 func drop_grabbed_tile() -> void:
 	if hover_space == null || hover_space.placed_tile != null:
-		var space_per_tile: float = WINDOW_WIDTH / (rack_tiles.size()+1)
+		var space_per_tile: float = WINDOW_WIDTH / (rack_tiles.size() + 1)
 		var new_hover_index: int = floori(get_viewport().get_mouse_position().x / space_per_tile)
 		rack_tiles.insert(new_hover_index, grabbed_tile)
 		grabbed_tile.rotation = 0
@@ -96,6 +103,7 @@ func drop_grabbed_tile() -> void:
 		grabbed_tile = null
 		anim_render_rack()
 
+
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Addition of random cells for testing
@@ -105,24 +113,26 @@ func _ready() -> void:
 	anim_render_rack()
 	DisplayServer.window_set_mode(DisplayServer.WindowMode.WINDOW_MODE_FULLSCREEN)
 
+
 ## Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	anim_grabbed_drag(delta)
+
 
 ## Animation for Tile Dragging
 func anim_grabbed_drag(delta: float) -> void:
 	if grabbed_tile != null && hover_space == null:
 		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
 		var center_pos: Vector2 = grabbed_tile.position
-		var scale = 12.0/(ceil((rack_tiles.size()+1)/4.0)*4.0)
+		var scale = 12.0/(ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
 		center_pos.x += 75
-		center_pos.y += 75-65*scale
-		var velocity: float = center_pos.distance_to(mouse_pos)*10
+		center_pos.y += 75 - 65 * scale
+		var velocity: float = center_pos.distance_to(mouse_pos) * 10
 		var angle: float = mouse_pos.angle_to_point(center_pos)
-		var x_diff: float = -cos(angle)*velocity*delta
-		var y_diff: float = -sin(angle)*velocity*delta
+		var x_diff: float = -cos(angle) * velocity * delta
+		var y_diff: float = -sin(angle) * velocity * delta
 		if abs(grabbed_tile.position.x - mouse_pos.x) < x_diff:
-			grabbed_tile.position.x = mouse_pos.x-75
+			grabbed_tile.position.x = mouse_pos.x - 75
 			grabbed_tile.rotation = 0
 		else:
 			grabbed_tile.position.x += x_diff
@@ -131,6 +141,7 @@ func anim_grabbed_drag(delta: float) -> void:
 			grabbed_tile.position.y = mouse_pos.y - (75 - 65 * scale)
 		else:
 			grabbed_tile.position.y += y_diff
+
 
 ## Animation to render rack texture and it's tiles
 func anim_render_rack() -> void:
@@ -172,6 +183,8 @@ func anim_render_rack() -> void:
 					0.2)
 			tween.parallel().tween_property(rack_tiles[n], "scale", Vector2(scale, scale), 0.2)
 
+
+# TODO: Remove once the system is more robust
 var possible_chars: Array = [
 	"A","B","C","D","E","F","G","H","I","J","K","L","M",
 	"N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
@@ -181,6 +194,7 @@ func _temp_generate_random_tile():
 	var base_tile: BaseRenderTile = BaseRenderTile.instantiate()
 	base_tile.default_init(possible_chars[rng.randi_range(0,25)])
 	return base_tile
+
 
 ## Input capture when user input occurs
 func _input(event: InputEvent):

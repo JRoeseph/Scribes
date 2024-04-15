@@ -12,6 +12,7 @@ enum TileShape {
 	arrow,
 	star,
 }
+
 ## The valid colors for tiles
 enum TileColor {
 	Basic,
@@ -24,6 +25,7 @@ enum TileColor {
 	Black,
 	Amber,
 }
+
 ## The valid fonts for tiles
 enum TileFont {
 	Basic,
@@ -39,6 +41,7 @@ var shape: TileShape = TileShape.Basic :
 		return shape
 	set(value):
 		shape = value
+
 ## The color of the tile object
 var color: TileColor = TileColor.Basic :
 	get:
@@ -51,18 +54,21 @@ var font: TileFont = TileFont.Basic :
 		return font
 	set(value):
 		font = value
+
 ## The character(s) of the tile object
 var character: String = "" :
 	get:
 		return character
 	set(value):
 		character = value
+
 ## The value of the tile object
 var value: float = 0 :
 	get:
 		return value
 	set(val):
 		value = val
+
 
 func _init(char: String, val: float) -> void:
 	character = char
