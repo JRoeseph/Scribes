@@ -185,7 +185,7 @@ func _temp_generate_random_tile():
 ## Input capture when user input occurs
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion:
-		if (get_viewport().get_mouse_position().y > WINDOW_HEIGHT - 300 && 
+		if (get_viewport().get_mouse_position().y > $Rack.position.y && 
 				grabbed_tile != null && hover_space == null):
 			var space_per_tile: float = WINDOW_WIDTH / (rack_tiles.size() + 1)
 			var new_hover_index: int = floori(
@@ -193,7 +193,7 @@ func _input(event: InputEvent):
 			if new_hover_index != hover_index:
 				hover_index = new_hover_index
 				anim_render_rack()
-		elif get_viewport().get_mouse_position().y <= WINDOW_HEIGHT - 300 && hover_index != -1:
+		elif hover_index != -1 &&get_viewport().get_mouse_position().y <= $Rack.position.y:
 			hover_index = -1
 			anim_render_rack()
 	elif event is InputEventMouseButton:
