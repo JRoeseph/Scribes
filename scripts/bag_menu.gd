@@ -52,6 +52,7 @@ func _on_close_button_pressed() -> void:
 	$TilePreview/ShapeLabel.text = "Shape: "
 	$TilePreview/ColorLabel.text = "Color: "
 	$TilePreview/FontLabel.text = "Font: "
+	tile_to_render_tile.clear()
 
 ## Render tiles initially when bag menu is opened
 func render_tiles() -> void:
@@ -158,8 +159,8 @@ func select_tile(tile: BaseTile):
 	preview_tile = BaseRenderTile.instantiate()
 	preview_tile.init_class(tile)
 	add_child(preview_tile)
-	preview_tile.scale = Vector2(2,2)
-	preview_tile.position = Vector2(50+75, 720+75)
+	preview_tile.scale = Vector2(2, 2)
+	preview_tile.position = Vector2(50 + 75, 720 + 75)
 	$TilePreview/CharacterLabel.text = "Character: " + tile.character
 	$TilePreview/ValueLabel.text = "Value : " + str(tile.value)
 	$TilePreview/ShapeLabel.text = "Shape: " + tile.TILE_SHAPE_TO_STRING[tile.shape]

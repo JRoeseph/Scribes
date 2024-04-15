@@ -119,7 +119,7 @@ func drop_grabbed_tile() -> void:
 func _ready() -> void:
 	player = Player.new()
 	# Addition of random cells from the bag for testing
-	for n in range(12):
+	for n in range(22):
 		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()
 		render_tile.init_class(player.pull_tile())
 		rack_tiles.push_back(render_tile)
