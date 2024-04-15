@@ -163,6 +163,6 @@ func select_tile(tile: BaseTile):
 	preview_tile.position = Vector2(50 + 75, 720 + 75)
 	$TilePreview/CharacterLabel.text = "Character: " + tile.character
 	$TilePreview/ValueLabel.text = "Value : " + str(tile.value)
-	$TilePreview/ShapeLabel.text = "Shape: " + tile.TILE_SHAPE_TO_STRING[tile.shape]
-	$TilePreview/ColorLabel.text = "Color: " + tile.TILE_COLOR_TO_STRING[tile.color]
-	$TilePreview/FontLabel.text = "Font: " + tile.TILE_FONT_TO_STRING[tile.font]
+	$TilePreview/ShapeLabel.text = "Shape: " + BaseTile.TILE_SHAPE_TO_STRING[tile.shape]
+	$TilePreview/ColorLabel.text = "Color: " + BaseTile.TILE_COLOR_TO_STRING[tile.color]
+	$TilePreview/FontLabel.text = "Font: " + BaseTile.TILE_FONT_TO_STRING[tile.font]

@@ -23,6 +23,13 @@ var remaining_bag: Array = [] :
 	set(value):
 		remaining_bag = value
 
+## The number of tiles the player is able to have on their rack
+var rack_size: int = 12 :
+	get:
+		return rack_size
+	set(value):
+		rack_size = value
+
 
 ## Initializes the bag variable with a given 
 func initialize_bag(bag_type: BagType) -> void:
@@ -77,6 +84,6 @@ func pull_tile() -> BaseTile:
 	# TODO: We will need to have one random number generator for all run content and be able to set
 	# a seed on it eventually
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	var return_tile: BaseTile = remaining_bag[rng.randi_range(0, remaining_bag.size()-1)]
+	var return_tile: BaseTile = remaining_bag[rng.randi_range(0, remaining_bag.size() - 1)]
 	remaining_bag.erase(return_tile)
 	return return_tile

@@ -8,11 +8,11 @@ extends Node2D
 var BoardSpace: PackedScene = load("res://scenes/board_space.tscn")
 
 # TODO: replace these around the project with whatever system Andy is gonna use for resolution
-var WINDOW_WIDTH: float = 1920.0
-var WINDOW_HEIGHT: float = 1080.0
+const WINDOW_WIDTH: float = 1920.0
+const WINDOW_HEIGHT: float = 1080.0
 
-var ZOOM_FACTOR_MIN: int = -25
-var ZOOM_FACTOR_MAX: int = 7
+const ZOOM_FACTOR_MIN: int = -25
+const ZOOM_FACTOR_MAX: int = 7
 
 ## The 2d array that stores the BoardSpaces
 var spaces: Array = [] :

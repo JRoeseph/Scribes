@@ -11,8 +11,8 @@ extends Node2D
 var BaseRenderTile: PackedScene = load("res://scenes/base_render_tile.tscn")
 
 # TODO: replace these around the project with whatever system Andy is gonna use for resolution
-var WINDOW_WIDTH: float = 1920.0
-var WINDOW_HEIGHT: float = 1080.0
+const WINDOW_WIDTH: float = 1920.0
+const WINDOW_HEIGHT: float = 1080.0
 
 ## The tile being dragged by the user. null if none is active
 var grabbed_tile: BaseRenderTile = null:
@@ -118,8 +118,7 @@ func drop_grabbed_tile() -> void:
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	player = Player.new()
-	# Addition of random cells from the bag for testing
-	for n in range(22):
+	for n in range(player.rack_size):
 		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()
 		render_tile.init_class(player.pull_tile())
 		rack_tiles.push_back(render_tile)

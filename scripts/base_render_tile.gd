@@ -19,6 +19,7 @@ func init_class(tile: BaseTile) -> BaseRenderTile:
 	$Value.text = str(base_tile.value)
 	return self
 
+
 ## Called when a tile is clicked
 func _on_button_down() -> void:
 	get_parent().tile_pressed(self)

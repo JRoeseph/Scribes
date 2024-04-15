@@ -13,17 +13,14 @@ enum TileShape {
 	LARGE = 4,
 }
 
-var TILE_SHAPE_TO_STRING: Dictionary = {
+## A dictionary to get the string variant of the TileShape enum
+const TILE_SHAPE_TO_STRING: Dictionary = {
 	TileShape.BASIC: "Basic",
 	TileShape.ARROW: "Arrow",
 	TileShape.STAR: "Star",
 	TileShape.HALF: "Half",
 	TileShape.LARGE: "Large",
-} :
-	get:
-		return TILE_SHAPE_TO_STRING
-	set(val):
-		push_error("TILE_SHAPE_TO_STRING is constant")
+}
 		
 ## The valid colors for tiles
 enum TileColor {
@@ -38,7 +35,8 @@ enum TileColor {
 	AMBER = 8,
 }
 
-var TILE_COLOR_TO_STRING: Dictionary = {
+## A dictionary to get the string variant of the TileColor enum
+const TILE_COLOR_TO_STRING: Dictionary = {
 	TileColor.BASIC: "Basic",
 	TileColor.RED: "Red",
 	TileColor.ORANGE: "Orange",
@@ -48,11 +46,7 @@ var TILE_COLOR_TO_STRING: Dictionary = {
 	TileColor.PURPLE: "Purple",
 	TileColor.BLACK: "Black",
 	TileColor.AMBER: "Amber",
-} :
-	get:
-		return TILE_COLOR_TO_STRING
-	set(val):
-		push_error("TILE_COLOR_TO_STRING is constant")
+}
 
 ## The valid fonts for tiles
 enum TileFont {
@@ -63,17 +57,14 @@ enum TileFont {
 	ASCII = 4,
 }
 
-var TILE_FONT_TO_STRING: Dictionary = {
+## A dictionary to get the string variant of the TileFont enum
+const TILE_FONT_TO_STRING: Dictionary = {
 	TileFont.BASIC: "Basic",
 	TileFont.ARIAL: "Arial",
 	TileFont.TIMES_NEW_ROMAN: "Times New Roman",
 	TileFont.COMIC_SANS: "Comic Sans",
 	TileFont.ASCII: "ASCII",
-} :
-	get:
-		return TILE_FONT_TO_STRING
-	set(val):
-		push_error("TILE_FONT_TO_STRING is constant")
+}
 
 ## The shape of the tile object
 var shape: TileShape = TileShape.BASIC :
@@ -88,6 +79,7 @@ var color: TileColor = TileColor.BASIC :
 		return color
 	set(value):
 		color = value
+
 ## The font of the tile object
 var font: TileFont = TileFont.BASIC :
 	get:
@@ -110,6 +102,7 @@ var value: float = 0 :
 		value = val
 
 
+# Constructor
 func _init(char: String, val: float, shap = TileShape.BASIC, 
 		col = TileColor.BASIC, fnt = TileFont.BASIC) -> void:
 	if shap is TileShape && col is TileColor && fnt is TileFont:
