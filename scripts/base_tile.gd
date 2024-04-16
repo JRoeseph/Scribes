@@ -102,6 +102,62 @@ var value: float = 0 :
 		value = val
 
 
+## This function returns the corresponding TileShape from a string
+func string_to_shape(string: String) -> TileShape:
+	match(string):
+		"BASIC":
+			return TileShape.BASIC
+		"HALF":
+			return TileShape.HALF
+		"LARGE":
+			return TileShape.LARGE
+		"ARROW":
+			return TileShape.ARROW
+		"STAR":
+			return TileShape.STAR
+	return TileShape.BASIC
+
+
+## This function returns the corresponding TileColor from a string
+func string_to_color(string: String) -> TileColor:
+	match(string):
+		"BASIC":
+			return TileColor.BASIC
+		"RED":
+			return TileColor.RED
+		"ORANGE":
+			return TileColor.ORANGE
+		"YELLOW":
+			return TileColor.YELLOW
+		"GREEN":
+			return TileColor.GREEN
+		"BLUE":
+			return TileColor.BLUE
+		"PURPLE":
+			return TileColor.PURPLE
+		"BLACK":
+			return TileColor.BLACK
+		"AMBER":
+			return TileColor.AMBER
+	return TileColor.BASIC
+
+
+## This function returns the corresponding TileFont from a string
+func string_to_font(string: String) -> TileFont:
+	match(string):
+		"BASIC":
+			return TileFont.BASIC
+		"ASCII":
+			return TileFont.ASCII
+		"COMIC_SANS":
+			return TileFont.COMIC_SANS
+		"TIMES_NEW_ROMAN":
+			return TileFont.TIMES_NEW_ROMAN
+		"ARIAL":
+			return TileFont.ARIAL
+	return TileFont.BASIC
+
+
 # Constructor
 func _init(char: String, val: float, shap = TileShape.BASIC, 
 		col = TileColor.BASIC, fnt = TileFont.BASIC) -> void:
@@ -114,46 +170,8 @@ func _init(char: String, val: float, shap = TileShape.BASIC,
 	elif shap is String && col is String && fnt is String:
 		character = char
 		value = val
-		match(shap):
-			"BASIC":
-				shape = TileShape.BASIC
-			"HALF":
-				shape = TileShape.HALF
-			"LARGE":
-				shape = TileShape.LARGE
-			"ARROW":
-				shape = TileShape.ARROW
-			"STAR":
-				shape = TileShape.STAR
-		match(col):
-			"BASIC":
-				color = TileColor.BASIC
-			"RED":
-				color = TileColor.RED
-			"ORANGE":
-				color = TileColor.ORANGE
-			"YELLOW":
-				color = TileColor.YELLOW
-			"GREEN":
-				color = TileColor.GREEN
-			"BLUE":
-				color = TileColor.BLUE
-			"PURPLE":
-				color = TileColor.PURPLE
-			"BLACK":
-				color = TileColor.BLACK
-			"AMBER":
-				color = TileColor.AMBER
-		match(fnt):
-			"BASIC":
-				font = TileFont.BASIC
-			"ASCII":
-				font = TileFont.ASCII
-			"COMIC_SANS":
-				font = TileFont.COMIC_SANS
-			"TIMES_NEW_ROMAN":
-				font = TileFont.TIMES_NEW_ROMAN
-			"ARIAL":
-				font = TileFont.ARIAL
+		shape = string_to_shape(shap)
+		color = string_to_color(col)
+		font = string_to_font(fnt)
 	else:
 		push_error("Invalid BaseTile constructor arguments")

@@ -40,7 +40,7 @@ var preview_tile: BaseRenderTile = null :
 
 ## Executed when the close button is clicked
 func _on_close_button_pressed() -> void:
-	get_parent().on_bag_close()
+	get_parent().on_bag_closed()
 	while true:
 		var tile: BaseRenderTile = $TileArea.get_child(0)
 		if tile == null:

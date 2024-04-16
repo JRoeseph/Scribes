@@ -221,7 +221,7 @@ func _input(event: InputEvent):
 
 
 ## This function is called when the player opens their bag to view the menu
-func on_bag_open():
+func on_bag_opened():
 	$BagMenu.visible = true
 	$BagMenu.render_tiles()
 	for n in range(rack_tiles.size()):
@@ -231,7 +231,7 @@ func on_bag_open():
 
 
 ## This function is called when the player closes the bag to view the board
-func on_bag_close():
+func on_bag_closed():
 	$BagMenu.visible = false
 	for n in range(rack_tiles.size()):
 		rack_tiles[n].visible = true
