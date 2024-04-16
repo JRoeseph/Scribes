@@ -5,14 +5,17 @@ extends Node2D
 ## This environment is specifically for the board, placement, etc. It will handle
 ## tiles, dragging, placing, storing the contents, calculating score, and round information
 
-var BaseTile: PackedScene = load("res://scenes/base_tile.tscn")
+# TODO: GENERAL TODO is to replace any instance of "get_parent" with signals. It appears
+# referencing children is in general pretty safe, but parents not as much. OR, if that isn't
+# possible with signals, have functions at each layer
+var BaseRenderTile: PackedScene = load("res://scenes/base_render_tile.tscn")
 
 # TODO: replace these around the project with whatever system Andy is gonna use for resolution
-var WINDOW_WIDTH: float = 1920.0
-var WINDOW_HEIGHT: float = 1080.0
+const WINDOW_WIDTH: float = 1920.0
+const WINDOW_HEIGHT: float = 1080.0
 
 ## The tile being dragged by the user. null if none is active
-var grabbed_tile: BaseTile = null:
+var grabbed_tile: BaseRenderTile = null:
 	get:
 		return grabbed_tile
 	set(value):
@@ -54,9 +57,23 @@ var grab_tile_hover_tween: Tween = null :
 	set(value):
 		grab_tile_hover_tween = value
 
+## The object that stores the player data for the run
+var player: Player = null :
+	get:
+		return player
+	set(value):
+		player = value
+
+## Whether or not the bag menu is open
+var is_bag_open: bool = false :
+	get:
+		return is_bag_open
+	set(value):
+		is_bag_open = value
+
 
 ## Called when a child BaseTile is clicked 
-func tile_pressed(tile: BaseTile) -> void:
+func tile_pressed(tile: BaseRenderTile) -> void:
 	grabbed_tile = tile
 
 
@@ -100,9 +117,11 @@ func drop_grabbed_tile() -> void:
 
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# Addition of random cells for testing
-	for n in range(17):
-		rack_tiles.push_back(_temp_generate_random_tile())
+	player = Player.new()
+	for n in range(player.rack_size):
+		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()
+		render_tile.init_class(player.pull_tile())
+		rack_tiles.push_back(render_tile)
 		add_child(rack_tiles[n])
 	anim_render_rack()
 	DisplayServer.window_set_mode(DisplayServer.WindowMode.WINDOW_MODE_FULLSCREEN)
@@ -178,22 +197,14 @@ func anim_render_rack() -> void:
 			tween.parallel().tween_property(rack_tiles[n], "scale", Vector2(scale, scale), 0.2)
 
 
-# TODO: Remove once the system is more robust
-var possible_chars: Array = [
-	"A","B","C","D","E","F","G","H","I","J","K","L","M",
-	"N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
-]
-var rng = RandomNumberGenerator.new()
-func _temp_generate_random_tile():
-	var base_tile: BaseTile = BaseTile.instantiate()
-	base_tile.default_init(possible_chars[rng.randi_range(0,25)])
-	return base_tile
-
-
 ## Input capture when user input occurs
 func _input(event: InputEvent):
+	if event is InputEventKey && event.physical_keycode == KEY_ESCAPE:
+		get_tree().quit()
+	if is_bag_open:
+		return
 	if event is InputEventMouseMotion:
-		if (get_viewport().get_mouse_position().y > WINDOW_HEIGHT - 300 && 
+		if (get_viewport().get_mouse_position().y > $Rack.position.y && 
 				grabbed_tile != null && hover_space == null):
 			var space_per_tile: float = WINDOW_WIDTH / (rack_tiles.size() + 1)
 			var new_hover_index: int = floori(
@@ -201,13 +212,34 @@ func _input(event: InputEvent):
 			if new_hover_index != hover_index:
 				hover_index = new_hover_index
 				anim_render_rack()
-		elif get_viewport().get_mouse_position().y <= WINDOW_HEIGHT - 300 && hover_index != -1:
+		elif hover_index != -1 && get_viewport().get_mouse_position().y <= $Rack.position.y:
 			hover_index = -1
 			anim_render_rack()
 	elif event is InputEventMouseButton:
 		if grabbed_tile != null && event.button_index == MOUSE_BUTTON_LEFT && !event.pressed:
 			drop_grabbed_tile()
-	elif event is InputEventKey:
-		match(event.physical_keycode):
-			KEY_ESCAPE:
-				get_tree().quit()
+
+
+## This function is called when the player opens their bag to view the menu
+func on_bag_opened():
+	$BagMenu.visible = true
+	$BagMenu.render_tiles()
+	for n in range(rack_tiles.size()):
+		rack_tiles[n].visible = false
+	get_node("Rack").visible = false
+	is_bag_open = true
+
+
+## This function is called when the player closes the bag to view the board
+func on_bag_closed():
+	$BagMenu.visible = false
+	for n in range(rack_tiles.size()):
+		rack_tiles[n].visible = true
+	get_node("Rack").visible = true
+	is_bag_open = false
+	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
+	var new_alpha: Color = $Bag/BagSprite.self_modulate
+	new_alpha.a = 1
+	tween.parallel().tween_property($Bag/BagSprite, "self_modulate", new_alpha, 0.2)
+	tween.parallel().tween_property($Bag/BagSprite, "position", Vector2(75, 75), 0.2)
+	tween.parallel().tween_property($Bag/BagSprite, "scale", Vector2(1, 1), 0.2)

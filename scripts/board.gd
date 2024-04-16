@@ -8,11 +8,11 @@ extends Node2D
 var BoardSpace: PackedScene = load("res://scenes/board_space.tscn")
 
 # TODO: replace these around the project with whatever system Andy is gonna use for resolution
-var WINDOW_WIDTH: float = 1920.0
-var WINDOW_HEIGHT: float = 1080.0
+const WINDOW_WIDTH: float = 1920.0
+const WINDOW_HEIGHT: float = 1080.0
 
-var ZOOM_FACTOR_MIN: int = -25
-var ZOOM_FACTOR_MAX: int = 7
+const ZOOM_FACTOR_MIN: int = -25
+const ZOOM_FACTOR_MAX: int = 7
 
 ## The 2d array that stores the BoardSpaces
 var spaces: Array = [] :
@@ -92,6 +92,8 @@ func anim_render_board(starting_pos: Vector2):
 
 ## Returns the board space the mouse cursor is over, returns null if none
 func find_hover_space() -> BoardSpace:
+	if get_global_mouse_position().y > get_parent().get_node("Rack/RackTexture").position.y:
+		return null
 	var abs_tl = self.position + top_left_pos
 	var current_scale: float = pow(1.1, zoom_factor)
 	var board_rect: Rect2 = Rect2(abs_tl,
@@ -122,6 +124,8 @@ func ensure_board_centered():
 
 ## Captures input for handling interactions with the board
 func _input(event: InputEvent):
+	if get_parent().is_bag_open:
+		return
 	if event is InputEventMouseMotion:
 		if event.get_pressure() == 1 && get_parent().grabbed_tile == null:
 			self.position += event.relative
