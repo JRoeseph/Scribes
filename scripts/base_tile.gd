@@ -159,16 +159,16 @@ func string_to_font(string: String) -> TileFont:
 
 
 # Constructor
-func _init(char: String, val: float, shap = TileShape.BASIC, 
+func _init(chr: String, val: float, shap = TileShape.BASIC, 
 		col = TileColor.BASIC, fnt = TileFont.BASIC) -> void:
 	if shap is TileShape && col is TileColor && fnt is TileFont:
-		character = char
+		character = chr
 		value = val
 		shape = shap
 		color = col
 		font = fnt
 	elif shap is String && col is String && fnt is String:
-		character = char
+		character = chr
 		value = val
 		shape = string_to_shape(shap)
 		color = string_to_color(col)

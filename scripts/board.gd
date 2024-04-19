@@ -7,12 +7,14 @@ extends Node2D
 
 var BoardSpace: PackedScene = load("res://scenes/board_space.tscn")
 
-# TODO: replace these around the project with whatever system Andy is gonna use for resolution
-const WINDOW_WIDTH: float = 1920.0
-const WINDOW_HEIGHT: float = 1080.0
-
 const ZOOM_FACTOR_MIN: int = -25
 const ZOOM_FACTOR_MAX: int = 7
+
+## Reference to the main environment
+@onready var main_env: Node = get_parent()
+
+## Reference to the area that defines the limits of the board
+@onready var board_area: Node = $"../BoardArea"
 
 ## The 2d array that stores the BoardSpaces
 var spaces: Array = [] :
@@ -63,14 +65,15 @@ func _ready():
 
 
 ## Builds the initial conditions for the board to be built
-## TODO: Andy corrects this in the resolution change
 func build_board():
-	var x_scale: float = WINDOW_WIDTH / (spaces.size() * 180.0)
-	var y_scale: float = WINDOW_HEIGHT / (spaces[0].size() * 180.0)
+	var x_scale: float = board_area.size.x / (spaces.size() * 180.0)
+	var y_scale: float = board_area.size.y / (spaces[0].size() * 180.0)
 	var new_scale: float = x_scale if x_scale < y_scale else y_scale
 	zoom_factor = round(log(new_scale) / log(1.1))
-	var x_offset: float = (WINDOW_WIDTH - (spaces.size() * 180.0) * new_scale) / 2
-	var y_offset: float = (WINDOW_HEIGHT - (spaces[0].size() * 180.0) * new_scale) / 2
+	var drag_area_center: Vector2 = board_area.position + board_area.size / 2
+	var x_offset: float = drag_area_center.x - (spaces.size() * 180.0 * new_scale) / 2
+	var y_offset: float = drag_area_center.y - (spaces[0].size() * 180.0 * new_scale) / 2
+	
 	anim_render_board(Vector2(x_offset, y_offset))
 	top_left_pos = Vector2(x_offset, y_offset)
 
@@ -92,7 +95,7 @@ func anim_render_board(starting_pos: Vector2):
 
 ## Returns the board space the mouse cursor is over, returns null if none
 func find_hover_space() -> BoardSpace:
-	if get_global_mouse_position().y > get_parent().get_node("Rack/RackTexture").position.y:
+	if get_global_mouse_position().y > $"../Rack/RackTexture".global_position.y:
 		return null
 	var abs_tl = self.position + top_left_pos
 	var current_scale: float = pow(1.1, zoom_factor)
@@ -112,45 +115,44 @@ func find_hover_space() -> BoardSpace:
 ## Ensures any part of the board is in the center of the screen by making it so the edges can't
 ## go across the center in the opposite direction
 func ensure_board_centered():
-	if self.position.x + top_left_pos.x + board_size.x < WINDOW_WIDTH / 2:
-		self.position.x = WINDOW_WIDTH / 2 - top_left_pos.x - board_size.x
-	elif self.position.x + top_left_pos.x > WINDOW_WIDTH / 2:
-		self.position.x = WINDOW_WIDTH / 2 - top_left_pos.x
-	if self.position.y + top_left_pos.y + board_size.y < WINDOW_HEIGHT/2:
-		self.position.y = WINDOW_HEIGHT / 2 - top_left_pos.y - board_size.y
-	elif self.position.y + top_left_pos.y > WINDOW_HEIGHT / 2:
-		self.position.y = WINDOW_HEIGHT / 2 - top_left_pos.y
+	var drag_area_center: Vector2 = board_area.position + board_area.size / 2
+	if self.position.x + top_left_pos.x + board_size.x < drag_area_center.x:
+		self.position.x = drag_area_center.x - top_left_pos.x - board_size.x
+	elif self.position.x + top_left_pos.x > drag_area_center.x:
+		self.position.x = drag_area_center.x - top_left_pos.x
+	if self.position.y + top_left_pos.y + board_size.y < drag_area_center.y:
+		self.position.y = drag_area_center.y - top_left_pos.y - board_size.y
+	elif self.position.y + top_left_pos.y > drag_area_center.y:
+		self.position.y = drag_area_center.y - top_left_pos.y
 
 
 ## Captures input for handling interactions with the board
 func _input(event: InputEvent):
-	if get_parent().is_bag_open:
+	if main_env.is_bag_open:
 		return
 	if event is InputEventMouseMotion:
-		if event.get_pressure() == 1 && get_parent().grabbed_tile == null:
+		if event.get_pressure() == 1 && main_env.grabbed_tile == null:
 			self.position += event.relative
 			ensure_board_centered()
 		elif event.get_pressure() == 1:
 			var hover_space: BoardSpace = find_hover_space()
 			if hover_space == null || hover_space.placed_tile != null:
-				get_parent().hover_space = null
+				main_env.hover_space = null
 			else:
-				get_parent().hover_space = hover_space
+				main_env.hover_space = hover_space
 	elif event is InputEventMouseButton:
 		match(event.button_index):
 			MOUSE_BUTTON_WHEEL_UP:
-				if get_parent().grabbed_tile == null && zoom_factor < ZOOM_FACTOR_MAX:
+				if main_env.grabbed_tile == null && zoom_factor < ZOOM_FACTOR_MAX:
 					zoom_factor += 1
-					var current_scale: float = pow(1.1, zoom_factor)
 					var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
 							- get_global_mouse_position())
 					var offset: Vector2 = (mouse_to_topleft_pos * 1.1) - mouse_to_topleft_pos
 					top_left_pos += offset
 					anim_render_board(top_left_pos)
 			MOUSE_BUTTON_WHEEL_DOWN:
-				if get_parent().grabbed_tile == null && zoom_factor > ZOOM_FACTOR_MIN:
+				if main_env.grabbed_tile == null && zoom_factor > ZOOM_FACTOR_MIN:
 					zoom_factor -= 1
-					var current_scale: float = pow(1.1, zoom_factor)
 					var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
 							- get_global_mouse_position())
 					var offset: Vector2 = (mouse_to_topleft_pos / (1.1)) - mouse_to_topleft_pos

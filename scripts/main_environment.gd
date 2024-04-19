@@ -10,9 +10,8 @@ extends Node2D
 # possible with signals, have functions at each layer
 var BaseRenderTile: PackedScene = load("res://scenes/base_render_tile.tscn")
 
-# TODO: replace these around the project with whatever system Andy is gonna use for resolution
-const WINDOW_WIDTH: float = 1920.0
-const WINDOW_HEIGHT: float = 1080.0
+## Reference to the draggable area for the board
+@onready var drag_region: Control = $Rack/DragArea
 
 ## The tile being dragged by the user. null if none is active
 var grabbed_tile: BaseRenderTile = null:
@@ -49,6 +48,8 @@ var hover_space: BoardSpace = null :
 			hover_space = value
 			anim_grab_tile_to_hover()
 
+
+
 ## The tween for handling the animation for hovering over tiles. Needs to be stored so it can
 ## be killed externally if necessary
 var grab_tile_hover_tween: Tween = null :
@@ -84,10 +85,10 @@ func anim_grab_tile_to_hover(is_instant: bool = false) -> void:
 		grab_tile_hover_tween.kill()
 	grab_tile_hover_tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
 	if hover_space == null:
-		var scale = 12.0 / (ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
-		scale = scale if scale <= 1 else 1
+		var tile_scale = 12.0 / (ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
+		tile_scale = tile_scale if tile_scale <= 1 else 1
 		grab_tile_hover_tween.parallel().tween_property(grabbed_tile, "scale", 
-				Vector2(scale,scale), duration)
+				Vector2(tile_scale,tile_scale), duration)
 		return
 	else:
 		var hover_abs_pos: Vector2 = $Board.get_space_abs_pos(hover_space)
@@ -102,7 +103,7 @@ func anim_grab_tile_to_hover(is_instant: bool = false) -> void:
 ## Called when the left-mouse button is released and grabbed_tile is not null
 func drop_grabbed_tile() -> void:
 	if hover_space == null || hover_space.placed_tile != null:
-		var space_per_tile: float = WINDOW_WIDTH / (rack_tiles.size() + 1)
+		var space_per_tile: float = $Rack.size.x / (rack_tiles.size() + 1)
 		var new_hover_index: int = floori(get_viewport().get_mouse_position().x / space_per_tile)
 		rack_tiles.insert(new_hover_index, grabbed_tile)
 		grabbed_tile.rotation = 0
@@ -124,7 +125,8 @@ func _ready() -> void:
 		rack_tiles.push_back(render_tile)
 		add_child(rack_tiles[n])
 	anim_render_rack()
-	DisplayServer.window_set_mode(DisplayServer.WindowMode.WINDOW_MODE_FULLSCREEN)
+	get_window().size = Vector2i(1440, 810)
+	get_window().move_to_center()
 
 
 ## Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -137,9 +139,9 @@ func anim_grabbed_drag(delta: float) -> void:
 	if grabbed_tile != null && hover_space == null:
 		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
 		var center_pos: Vector2 = grabbed_tile.position
-		var scale = 12.0/(ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
+		var tile_scale = 12.0/(ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
 		center_pos.x += 75
-		center_pos.y += 75 - 65 * scale
+		center_pos.y += 75 - 65 * tile_scale
 		var velocity: float = center_pos.distance_to(mouse_pos) * 10
 		var angle: float = mouse_pos.angle_to_point(center_pos)
 		var x_diff: float = -cos(angle) * velocity * delta
@@ -151,7 +153,7 @@ func anim_grabbed_drag(delta: float) -> void:
 			grabbed_tile.position.x += x_diff
 			grabbed_tile.rotation = -atan(cos(angle) * velocity * delta / 10) / (PI / 4)
 		if abs(grabbed_tile.position.y - mouse_pos.y) < y_diff:
-			grabbed_tile.position.y = mouse_pos.y - (75 - 65 * scale)
+			grabbed_tile.position.y = mouse_pos.y - (75 - 65 * tile_scale)
 		else:
 			grabbed_tile.position.y += y_diff
 
@@ -160,41 +162,41 @@ func anim_grabbed_drag(delta: float) -> void:
 func anim_render_rack() -> void:
 	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
 	var count: int = rack_tiles.size() + 1 if grabbed_tile != null else rack_tiles.size()
-	var scale: float = 1
-	scale = min(1.0, 12.0 / (ceil(count / 4.0) * 4.0))
-	tween.parallel().tween_property(get_node("Rack/RackTexture"), 
-			"scale", Vector2(scale, scale), 0.2)
-	tween.parallel().tween_property(get_node("Rack/RackTexture"), 
-			"position", Vector2(0, WINDOW_HEIGHT - 200 * scale), 0.2)
-	tween.parallel().tween_property(get_node("Rack/RackTexture"), 
-			"size", Vector2(WINDOW_WIDTH * (1 / scale), 200), 0.2)
+	var tile_scale: float = min(1.0, 12.0 / (ceil(count / 4.0) * 4.0))
+	var rack_size: Vector2 = $Rack.size
+	tween.parallel().tween_property($Rack/RackTexture, 
+			"position", Vector2(0, (rack_size.y * (1 - tile_scale))), 0.2)
+	tween.parallel().tween_property($Rack/RackTexture,
+			"size", Vector2(rack_size.x, rack_size.y * tile_scale), 0.2)
+	var rack_height: float = $Rack/RackTexture.global_position.y
 	if rack_tiles.size() == 0:
 		return
 	# TODO: Andy will fix this bad code
-	if (get_viewport().get_mouse_position().y > WINDOW_HEIGHT - 300 && 
-			grabbed_tile != null && hover_index != -1):
-		var space_per_tile: float = WINDOW_WIDTH / count
+	var mouse_pos: Vector2 = get_viewport().get_mouse_position()
+	var drag_area: Vector2 = drag_region.global_position
+	if (mouse_pos.y > drag_area.y && grabbed_tile != null && hover_index != -1):
+		var space_per_tile: float = rack_size.x / count
 		var left_space: float = space_per_tile / 2 - 75
 		var rack_index: int = 0
 		for n: int in range(count):
 			if hover_index != n:
 				tween.parallel().tween_property(rack_tiles[rack_index], 
 						"position", 
-						Vector2(left_space + space_per_tile * n, 
-								WINDOW_HEIGHT - (80 + 120 * scale)), 
+						Vector2(left_space + space_per_tile * n, rack_height), 
 						0.2)
 				tween.parallel().tween_property(rack_tiles[rack_index], 
-						"scale", Vector2(scale,scale), 0.2)
+						"scale", Vector2(tile_scale, tile_scale), 0.2)
 				rack_index += 1
 	else:
-		var space_per_tile: float = WINDOW_WIDTH / rack_tiles.size()
+		var space_per_tile: float = $Rack.size.x / rack_tiles.size()
 		var left_space: float = space_per_tile / 2 - 75
 		for n: int in range(rack_tiles.size()):
 			tween.parallel().tween_property(rack_tiles[n], 
-					"position", 
-					Vector2(left_space + space_per_tile * n, WINDOW_HEIGHT - (80 + 120 * scale)), 
+					"global_position", 
+					Vector2(left_space + space_per_tile * n, rack_height), 
 					0.2)
-			tween.parallel().tween_property(rack_tiles[n], "scale", Vector2(scale, scale), 0.2)
+			tween.parallel().tween_property(rack_tiles[n], "scale", 
+					Vector2(tile_scale, tile_scale), 0.2)
 
 
 ## Input capture when user input occurs
@@ -204,15 +206,16 @@ func _input(event: InputEvent):
 	if is_bag_open:
 		return
 	if event is InputEventMouseMotion:
-		if (get_viewport().get_mouse_position().y > $Rack.position.y && 
+		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
+		if (mouse_pos.y > $Rack/DragArea.global_position.y && 
 				grabbed_tile != null && hover_space == null):
-			var space_per_tile: float = WINDOW_WIDTH / (rack_tiles.size() + 1)
+			var space_per_tile: float = $Rack.size.x / (rack_tiles.size() + 1)
 			var new_hover_index: int = floori(
-					get_viewport().get_mouse_position().x / space_per_tile)
+					mouse_pos.x / space_per_tile)
 			if new_hover_index != hover_index:
 				hover_index = new_hover_index
 				anim_render_rack()
-		elif hover_index != -1 && get_viewport().get_mouse_position().y <= $Rack.position.y:
+		elif hover_index != -1 && mouse_pos.y <= $Rack/DragArea.global_position.y:
 			hover_index = -1
 			anim_render_rack()
 	elif event is InputEventMouseButton:
@@ -226,7 +229,7 @@ func on_bag_opened():
 	$BagMenu.render_tiles()
 	for n in range(rack_tiles.size()):
 		rack_tiles[n].visible = false
-	get_node("Rack").visible = false
+	$Rack.visible = false
 	is_bag_open = true
 
 
@@ -235,7 +238,7 @@ func on_bag_closed():
 	$BagMenu.visible = false
 	for n in range(rack_tiles.size()):
 		rack_tiles[n].visible = true
-	get_node("Rack").visible = true
+	$Rack.visible = true
 	is_bag_open = false
 	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
 	var new_alpha: Color = $Bag/BagSprite.self_modulate
