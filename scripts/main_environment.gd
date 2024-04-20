@@ -13,6 +13,9 @@ var BaseRenderTile: PackedScene = load("res://scenes/base_render_tile.tscn")
 ## Reference to the draggable area for the board
 @onready var drag_region: Control = $Rack/DragArea
 
+##Reference to the texture of the rack
+@onready var rack_texture: Node = $Rack/RackTexture
+
 ## The tile being dragged by the user. null if none is active
 var grabbed_tile: BaseRenderTile = null:
 	get:
@@ -164,11 +167,11 @@ func anim_render_rack() -> void:
 	var count: int = rack_tiles.size() + 1 if grabbed_tile != null else rack_tiles.size()
 	var tile_scale: float = min(1.0, 12.0 / (ceil(count / 4.0) * 4.0))
 	var rack_size: Vector2 = $Rack.size
-	tween.parallel().tween_property($Rack/RackTexture, 
+	tween.parallel().tween_property(rack_texture, 
 			"position", Vector2(0, (rack_size.y * (1 - tile_scale))), 0.2)
-	tween.parallel().tween_property($Rack/RackTexture,
+	tween.parallel().tween_property(rack_texture,
 			"size", Vector2(rack_size.x, rack_size.y * tile_scale), 0.2)
-	var rack_height: float = $Rack/RackTexture.global_position.y
+	var rack_height: float = rack_texture.global_position.y
 	if rack_tiles.size() == 0:
 		return
 	# TODO: Andy will fix this bad code

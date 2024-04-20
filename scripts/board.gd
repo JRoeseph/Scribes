@@ -16,6 +16,9 @@ const ZOOM_FACTOR_MAX: int = 7
 ## Reference to the area that defines the limits of the board
 @onready var board_area: Node = $"../BoardArea"
 
+##Reference to the texture of the rack
+@onready var rack_texture: Node = $"../Rack/RackTexture"
+
 ## The 2d array that stores the BoardSpaces
 var spaces: Array = [] :
 	get:
@@ -95,7 +98,7 @@ func anim_render_board(starting_pos: Vector2):
 
 ## Returns the board space the mouse cursor is over, returns null if none
 func find_hover_space() -> BoardSpace:
-	if get_global_mouse_position().y > $"../Rack/RackTexture".global_position.y:
+	if get_global_mouse_position().y > rack_texture.global_position.y:
 		return null
 	var abs_tl = self.position + top_left_pos
 	var current_scale: float = pow(1.1, zoom_factor)

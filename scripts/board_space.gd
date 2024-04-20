@@ -6,7 +6,7 @@ extends Control
 ## at the end of a turn, and can release them if not locked
 
 ## Reference to the main environment
-@onready var main_env: Node = get_parent().get_parent()
+@onready var main_env: Node = get_parent().main_env
 
 ## The tile placed on this space. Null if none
 var placed_tile: BaseRenderTile = null :
