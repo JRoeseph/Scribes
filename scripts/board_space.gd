@@ -5,6 +5,9 @@ extends Control
 ## This class captures the grabbed tiles, stores them once placed, will lock them
 ## at the end of a turn, and can release them if not locked
 
+## Reference to the main environment
+@onready var main_env: Node = get_parent().main_env
+
 ## The tile placed on this space. Null if none
 var placed_tile: BaseRenderTile = null :
 	get:
@@ -24,7 +27,7 @@ var is_locked: bool = false :
 func tile_pressed(tile: BaseRenderTile) -> void:
 	if !is_locked:
 		remove_child(placed_tile)
-		get_parent().get_parent().grabbed_tile = tile
+		main_env.grabbed_tile = tile
 		placed_tile = null
 
 
@@ -32,12 +35,12 @@ func tile_pressed(tile: BaseRenderTile) -> void:
 func place_tile(tile: BaseRenderTile) -> void:
 	placed_tile = tile
 	add_child(placed_tile)
-	get_parent().get_parent().grab_tile_hover_tween.kill()
-	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
+	main_env.grab_tile_hover_tween.kill()
 	# TODO: These can help with the snapping bug, but the issue is the default position of the tile
 	# when it becomes a child of the space makes it have strange behavior. If you can set the tile
 	# position, rotation, and scale to what it is on the main environment, but as a child of the
 	# space, then execute these, it would fix the problem 
+	#var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
 	#tween.parallel().tween_property(placed_tile, "position", Vector2(15, 15), 0.2)
 	#tween.parallel().tween_property(placed_tile, "scale", Vector2(1, 1), 0.2)
 	#tween.parallel().tween_property(placed_tile, "rotation", 0, 0.2)

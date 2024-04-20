@@ -48,16 +48,19 @@ script = ExtResource("1_bi3dh")
 [node name="Rack" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_top = 900.0
+offset_right = 1920.0
+offset_bottom = 1080.0
 mouse_filter = 2
 
 [node name="RackTexture" type="TextureRect" parent="Rack"]
-layout_mode = 0
-offset_top = 880.0
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -180.0
 offset_right = 1920.0
-offset_bottom = 1080.0
-scale = Vector2(1.01, 1.01)
+grow_vertical = 0
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
@@ -65,9 +68,25 @@ texture = ExtResource("2_jku88")
 expand_mode = 1
 stretch_mode = 1
 
+[node name="DragArea" type="Control" parent="Rack"]
+layout_mode = 3
+anchors_preset = 0
+offset_top = -130.0
+offset_right = 1920.0
+offset_bottom = 180.0
+mouse_filter = 2
+
 [node name="Board" type="Node2D" parent="."]
 z_index = -1
 script = ExtResource("3_w5307")
+
+[node name="BoardArea" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 200.0
+offset_right = 1720.0
+offset_bottom = 900.0
+mouse_filter = 2
 
 [node name="Bag" type="Button" parent="."]
 offset_right = 150.0
