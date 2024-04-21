@@ -88,6 +88,14 @@ offset_right = 1720.0
 offset_bottom = 900.0
 mouse_filter = 2
 
+[node name="TileDragArea" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 40.0
+offset_right = 1880.0
+offset_bottom = 982.0
+mouse_filter = 2
+
 [node name="Bag" type="Button" parent="."]
 offset_right = 150.0
 offset_bottom = 150.0

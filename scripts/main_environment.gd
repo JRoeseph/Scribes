@@ -13,8 +13,11 @@ var BaseRenderTile: PackedScene = load("res://scenes/base_render_tile.tscn")
 ## Reference to the draggable area for the board
 @onready var drag_region: Control = $Rack/DragArea
 
-##Reference to the texture of the rack
+## Reference to the texture of the rack
 @onready var rack_texture: Node = $Rack/RackTexture
+
+## Reference to the total draggable area for the tiles
+@onready var tile_drag_area: Control = $TileDragArea
 
 ## The tile being dragged by the user. null if none is active
 var grabbed_tile: BaseRenderTile = null:
@@ -108,6 +111,7 @@ func drop_grabbed_tile() -> void:
 	if hover_space == null || hover_space.placed_tile != null:
 		var space_per_tile: float = $Rack.size.x / (rack_tiles.size() + 1)
 		var new_hover_index: int = floori(get_viewport().get_mouse_position().x / space_per_tile)
+		new_hover_index = clamp(new_hover_index, 0, rack_tiles.size())
 		rack_tiles.insert(new_hover_index, grabbed_tile)
 		grabbed_tile.rotation = 0
 		grabbed_tile = null
@@ -140,25 +144,41 @@ func _process(delta: float) -> void:
 ## Animation for Tile Dragging
 func anim_grabbed_drag(delta: float) -> void:
 	if grabbed_tile != null && hover_space == null:
-		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
-		var center_pos: Vector2 = grabbed_tile.position
-		var tile_scale = 12.0/(ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
-		center_pos.x += 75
-		center_pos.y += 75 - 65 * tile_scale
-		var velocity: float = center_pos.distance_to(mouse_pos) * 10
-		var angle: float = mouse_pos.angle_to_point(center_pos)
+		var clamped_pos: Vector2 = calculate_clamped_mouse_position()
+		var center_pos: Vector2 = calculate_tile_center()
+		var velocity: float = center_pos.distance_to(clamped_pos) * 10
+		var angle: float = clamped_pos.angle_to_point(center_pos)
 		var x_diff: float = -cos(angle) * velocity * delta
 		var y_diff: float = -sin(angle) * velocity * delta
-		if abs(grabbed_tile.position.x - mouse_pos.x) < x_diff:
-			grabbed_tile.position.x = mouse_pos.x - 75
+		if abs(center_pos.x - clamped_pos.x) < x_diff:
+			grabbed_tile.position.x = clamped_pos.x - 75
 			grabbed_tile.rotation = 0
 		else:
 			grabbed_tile.position.x += x_diff
 			grabbed_tile.rotation = -atan(cos(angle) * velocity * delta / 10) / (PI / 4)
-		if abs(grabbed_tile.position.y - mouse_pos.y) < y_diff:
-			grabbed_tile.position.y = mouse_pos.y - (75 - 65 * tile_scale)
+		if abs(center_pos.y - clamped_pos.y) < y_diff:
+			grabbed_tile.position.y = clamped_pos.y - center_pos.y
 		else:
 			grabbed_tile.position.y += y_diff
+
+
+## Calculate a mouse position clamped to the tile drag region
+func calculate_clamped_mouse_position() -> Vector2:
+	var mouse_pos: Vector2 = get_viewport().get_mouse_position()
+	var clamped_x_pos: float = clamp(mouse_pos.x, tile_drag_area.global_position.x,
+			tile_drag_area.global_position.x + tile_drag_area.size.x)
+	var clamped_y_pos: float = clamp(mouse_pos.y, tile_drag_area.global_position.y,
+			tile_drag_area.global_position.y + tile_drag_area.size.y)
+	return Vector2(clamped_x_pos, clamped_y_pos)
+
+
+## Calculate central grab space on grabbed tile
+func calculate_tile_center() -> Vector2:
+	var center_pos: Vector2 = grabbed_tile.position
+	var tile_scale = 12.0/(ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
+	center_pos.x += 75
+	center_pos.y += 75 - 65 * tile_scale
+	return center_pos
 
 
 ## Animation to render rack texture and it's tiles
@@ -182,7 +202,7 @@ func anim_render_rack() -> void:
 		var left_space: float = space_per_tile / 2 - 75
 		var rack_index: int = 0
 		for n: int in range(count):
-			if hover_index != n:
+			if hover_index != n && rack_index < rack_tiles.size():
 				tween.parallel().tween_property(rack_tiles[rack_index], 
 						"position", 
 						Vector2(left_space + space_per_tile * n, rack_height), 
@@ -210,7 +230,7 @@ func _input(event: InputEvent):
 		return
 	if event is InputEventMouseMotion:
 		var mouse_pos: Vector2 = get_viewport().get_mouse_position()
-		if (mouse_pos.y > $Rack/DragArea.global_position.y && 
+		if (mouse_pos.y > drag_region.global_position.y && 
 				grabbed_tile != null && hover_space == null):
 			var space_per_tile: float = $Rack.size.x / (rack_tiles.size() + 1)
 			var new_hover_index: int = floori(
@@ -218,7 +238,7 @@ func _input(event: InputEvent):
 			if new_hover_index != hover_index:
 				hover_index = new_hover_index
 				anim_render_rack()
-		elif hover_index != -1 && mouse_pos.y <= $Rack/DragArea.global_position.y:
+		elif hover_index != -1 && mouse_pos.y <= drag_region.global_position.y:
 			hover_index = -1
 			anim_render_rack()
 	elif event is InputEventMouseButton:
