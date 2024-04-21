@@ -145,7 +145,7 @@ func _process(delta: float) -> void:
 func anim_grabbed_drag(delta: float) -> void:
 	if grabbed_tile != null && hover_space == null:
 		var clamped_pos: Vector2 = calculate_clamped_mouse_position()
-		var center_pos: Vector2 = calculate_tile_center()
+		var center_pos: Vector2 = calculate_tile_drag_anchor()
 		var velocity: float = center_pos.distance_to(clamped_pos) * 10
 		var angle: float = clamped_pos.angle_to_point(center_pos)
 		var x_diff: float = -cos(angle) * velocity * delta
@@ -172,8 +172,8 @@ func calculate_clamped_mouse_position() -> Vector2:
 	return Vector2(clamped_x_pos, clamped_y_pos)
 
 
-## Calculate central grab space on grabbed tile
-func calculate_tile_center() -> Vector2:
+## Calculate anchor grab space on grabbed tile
+func calculate_tile_drag_anchor() -> Vector2:
 	var center_pos: Vector2 = grabbed_tile.position
 	var tile_scale = 12.0/(ceil((rack_tiles.size() + 1) / 4.0) * 4.0)
 	center_pos.x += 75
