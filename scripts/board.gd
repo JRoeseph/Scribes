@@ -55,6 +55,20 @@ var center_coords: Vector2i = Vector2i(7,7) :
 	set(value):
 		center_coords = value
 
+## The starting mouse coordinate when dragging the board
+var start_drag_pos: Vector2 :
+	get:
+		return start_drag_pos
+	set(value):
+		start_drag_pos = value
+
+## The starting mouse coordinate when dragging the board
+var last_click_position: Vector2 :
+	get:
+		return last_click_position
+	set(value):
+		last_click_position = value
+
 
 ## Called when the node enters the scene tree for the first time.
 func _ready():
@@ -135,7 +149,8 @@ func _input(event: InputEvent):
 		return
 	if event is InputEventMouseMotion:
 		if event.get_pressure() == 1 && main_env.grabbed_tile == null:
-			self.position += event.relative
+			var mouse_offset = get_global_mouse_position() - last_click_position
+			position = start_drag_pos + mouse_offset
 			ensure_board_centered()
 		elif event.get_pressure() == 1:
 			var hover_space: BoardSpace = find_hover_space()
@@ -161,6 +176,9 @@ func _input(event: InputEvent):
 					var offset: Vector2 = (mouse_to_topleft_pos / (1.1)) - mouse_to_topleft_pos
 					top_left_pos += offset
 					anim_render_board(top_left_pos)
+			MOUSE_BUTTON_LEFT:
+				start_drag_pos = position
+				last_click_position = get_global_mouse_position()
 
 
 ## Returns the absolute position relative to the window of a specific space
