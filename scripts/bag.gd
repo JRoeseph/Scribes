@@ -10,9 +10,3 @@ extends Button
 func _on_pressed() -> void:
 	if !get_parent().is_bag_open:
 		get_parent().on_bag_opened()
-		var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
-		var new_alpha: Color = $BagSprite.self_modulate
-		new_alpha.a = 0.5
-		tween.parallel().tween_property($BagSprite, "self_modulate", new_alpha, 0.2)
-		tween.parallel().tween_property($BagSprite, "position", Vector2(1380, 540), 0.2)
-		tween.parallel().tween_property($BagSprite, "scale", Vector2(6.171, 6.171), 0.2)

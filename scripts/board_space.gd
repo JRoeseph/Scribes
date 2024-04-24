@@ -6,7 +6,7 @@ extends Control
 ## at the end of a turn, and can release them if not locked
 
 ## Reference to the main environment
-@onready var main_env: Node = get_parent().main_env
+@onready var main_env: MainEnvironment = get_parent().main_env
 
 ## The tile placed on this space. Null if none
 var placed_tile: BaseRenderTile = null :
@@ -34,16 +34,16 @@ func tile_pressed(tile: BaseRenderTile) -> void:
 ## Places a tile into this space
 func place_tile(tile: BaseRenderTile) -> void:
 	placed_tile = tile
-	add_child(placed_tile)
+	var original_position = tile.global_position
+	var original_rotation = tile.tile_sprite.rotation
+	var original_scale = tile.scale / scale
+	add_child(tile)
 	main_env.grab_tile_hover_tween.kill()
-	# TODO: These can help with the snapping bug, but the issue is the default position of the tile
-	# when it becomes a child of the space makes it have strange behavior. If you can set the tile
-	# position, rotation, and scale to what it is on the main environment, but as a child of the
-	# space, then execute these, it would fix the problem 
-	#var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
-	#tween.parallel().tween_property(placed_tile, "position", Vector2(15, 15), 0.2)
-	#tween.parallel().tween_property(placed_tile, "scale", Vector2(1, 1), 0.2)
-	#tween.parallel().tween_property(placed_tile, "rotation", 0, 0.2)
-	placed_tile.position = Vector2(15, 15)
-	placed_tile.scale = Vector2(1, 1)
-	placed_tile.rotation = 0
+	# TODO: Tiles jump to the top left corner when double clicking them off the board
+	tile.global_position = original_position
+	tile.tile_sprite.rotation = original_rotation
+	tile.scale = original_scale
+	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
+	tween.parallel().tween_property(tile, "position", Vector2(15, 15), 0.2)
+	tween.parallel().tween_property(tile, "scale", Vector2(1, 1), 0.2)
+	tween.parallel().tween_property(tile.tile_sprite, "rotation", 0, 0.2)
