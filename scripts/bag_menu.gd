@@ -13,6 +13,9 @@ enum SortType {
 	FONT,
 }
 
+## Reference to the tile area
+@export var tile_area : Control
+
 ## A dictionary between the BaseTile objects and the BaseRenderTile counterparts in the bag
 var tile_to_render_tile: Dictionary = {} 
 
@@ -40,19 +43,19 @@ var preview_tile: BaseRenderTile = null :
 
 ## Executed when the close button is clicked
 func _on_close_button_pressed() -> void:
-	get_parent().on_bag_closed()
-	while true:
-		var tile: BaseRenderTile = $TileArea.get_child(0)
-		if tile == null:
-			break
-		$TileArea.remove_child(tile)
-	remove_child(preview_tile)
+	while tile_area.get_child_count() > 0:
+		var tile: BaseRenderTile = tile_area.get_child(0)
+		tile_area.remove_child(tile)
+	if preview_tile != null:
+		remove_child(preview_tile)
 	$TilePreview/CharacterLabel.text = "Character: " 
 	$TilePreview/ValueLabel.text = "Value : "
 	$TilePreview/ShapeLabel.text = "Shape: "
 	$TilePreview/ColorLabel.text = "Color: "
 	$TilePreview/FontLabel.text = "Font: "
 	tile_to_render_tile.clear()
+	get_parent().on_bag_closed()
+
 
 ## Render tiles initially when bag menu is opened
 func render_tiles() -> void:
@@ -60,13 +63,13 @@ func render_tiles() -> void:
 	var bag: Array = get_parent().player.full_bag if is_view_full else (
 		get_parent().player.remaining_bag)
 	var row_size: int = ceili(pow(bag.size(), 0.5))
-	var tile_size: float = $TileArea.size.x / row_size as float
+	var tile_size: float = tile_area.size.x / row_size as float
 	var x_pos: int = 0
 	var y_pos: int = 0
 	for tile: BaseTile in bag:
 		var new_tile: BaseRenderTile = BaseRenderTile.instantiate()
 		new_tile.init_class(tile)
-		$TileArea.add_child(new_tile)
+		tile_area.add_child(new_tile)
 		tile_to_render_tile[tile] = new_tile
 		new_tile.position = Vector2(x_pos * tile_size - 25, y_pos * tile_size - 25)
 		new_tile.scale = Vector2(tile_size / 200, tile_size / 200)
@@ -82,7 +85,7 @@ func reorder_tiles() -> void:
 	var bag: Array = get_parent().player.full_bag if is_view_full else (
 		get_parent().player.remaining_bag)
 	var row_size: int = ceili(pow(bag.size(), 0.5))
-	var tile_size: float = $TileArea.size.x / row_size as float
+	var tile_size: float = tile_area.size.x / row_size as float
 	var x_pos: int = 0
 	var y_pos: int = 0
 	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
@@ -105,10 +108,10 @@ func reorder_tiles() -> void:
 ## Resets and re-renders tiles
 func rerender_tiles() -> void:
 	while true:
-		var tile: BaseRenderTile = $TileArea.get_child(0)
+		var tile: BaseRenderTile = tile_area.get_child(0)
 		if tile == null:
 			break
-		$TileArea.remove_child(tile)
+		tile_area.remove_child(tile)
 	render_tiles()
 
 

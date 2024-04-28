@@ -3,17 +3,20 @@
 [ext_resource type="Script" path="res://scripts/board_space.gd" id="1_ejg71"]
 
 [node name="BoardSpace" type="Control"]
+z_index = -1
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_ejg71")
 
 [node name="Border" type="ColorRect" parent="."]
+z_index = -1
 layout_mode = 0
 offset_right = 180.0
 offset_bottom = 180.0
 color = Color(0.12549, 0.156863, 0.411765, 1)
 
 [node name="Place" type="ColorRect" parent="."]
+z_index = -1
 layout_mode = 0
 offset_left = 15.0
 offset_top = 15.0
