@@ -24,14 +24,14 @@ var spaces: Array = [] :
 		spaces = value
 		
 ## The power of 1.1 that the spaces zoom to (default size of 180x180)
-var zoom_factor: int = 0 :
+var zoom_factor: float = 0 :
 	get:
 		return zoom_factor
 	set(value):
 		zoom_factor = value
 		
 ## The current scale, calculated using zoom_factor
-var current_scale: float = 1.1 :
+var current_scale: float = 1 :
 	get:
 		return pow(1.1, zoom_factor)
 
@@ -152,9 +152,9 @@ func _input(event: InputEvent):
 	elif event is InputEventMouseButton:
 		match(event.button_index):
 			MOUSE_BUTTON_WHEEL_UP:
-				change_zoom(true)
+				change_zoom(1)
 			MOUSE_BUTTON_WHEEL_DOWN:
-				change_zoom(false)
+				change_zoom(-1)
 			MOUSE_BUTTON_LEFT:
 				start_drag_pos = position
 				last_click_position = get_global_mouse_position()
@@ -175,17 +175,20 @@ func on_mouse_motion_event(event: InputEvent):
 
 
 ## This function changes the current zoom level
-func change_zoom(zoom_in: bool):
-	if (main_env.grabbed_tile == null && 
-			((zoom_factor < ZOOM_FACTOR_MAX && zoom_in) ||
-			(zoom_factor > ZOOM_FACTOR_MIN && !zoom_in))):
-		zoom_factor += 1 if zoom_in else -1
-		var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
-				- get_global_mouse_position())
-		var zoomed_pos = mouse_to_topleft_pos * 1.1 if zoom_in else mouse_to_topleft_pos / (1.1)
-		var offset: Vector2 = zoomed_pos - mouse_to_topleft_pos
-		top_left_pos += offset
-		anim_render_board(top_left_pos)
+func change_zoom(zoom_in: float):
+	if (main_env.grabbed_tile != null || 
+			((zoom_factor >= ZOOM_FACTOR_MAX && zoom_in > 0) ||
+			(zoom_factor <= ZOOM_FACTOR_MIN && zoom_in < 0))):
+				return
+				
+	zoom_factor += zoom_in
+	var mouse_to_topleft_pos: Vector2 = (top_left_pos + self.position 
+			- get_global_mouse_position())
+	var position_factor = pow(1.1, zoom_in)
+	var zoomed_pos = mouse_to_topleft_pos * position_factor
+	var offset: Vector2 = zoomed_pos - mouse_to_topleft_pos
+	top_left_pos += offset
+	anim_render_board(top_left_pos)
 
 ## Returns the absolute position relative to the window of a specific space
 func get_space_abs_pos(space: BoardSpace) -> Vector2:
