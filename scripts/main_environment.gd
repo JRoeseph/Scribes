@@ -304,3 +304,26 @@ func update_bag_open_state(open: bool):
 	tween.parallel().tween_property(bag_sprite, "self_modulate", new_alpha, 0.2)
 	tween.parallel().tween_property(bag_sprite, "position", new_position, 0.2)
 	tween.parallel().tween_property(bag_sprite, "scale", new_scale, 0.2)
+
+
+func _on_end_turn_button_pressed():
+	if verify_valid_play():
+		end_turn()
+
+
+func verify_valid_play() -> bool:
+	return true
+
+
+func end_turn():
+	board.lock_tiles()
+	replenish_rack()
+
+
+func replenish_rack():
+	for n in range(player.rack_size - rack_count):
+		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()
+		render_tile.init_class(player.pull_tile())
+		rack_tiles.push_back(render_tile)
+		add_child(render_tile)
+	anim_render_rack()
