@@ -193,3 +193,10 @@ func change_zoom(zoom_in: float):
 ## Returns the absolute position relative to the window of a specific space
 func get_space_abs_pos(space: BoardSpace) -> Vector2:
 	return space.global_position + Vector2(1, 1) * 90 * current_scale
+
+
+func lock_tiles():
+	for x: int in range(spaces.size()):
+		for y: int in range(spaces[0].size()):
+			if spaces[x][y].placed_tile != null:
+				spaces[x][y].is_locked = true

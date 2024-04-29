@@ -159,12 +159,9 @@ func drop_grabbed_tile() -> void:
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	player = Player.new()
-	for n in range(player.rack_size):
-		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()
-		render_tile.init_class(player.pull_tile())
-		rack_tiles.push_back(render_tile)
-		add_child(rack_tiles[n])
-	anim_render_rack()
+	replenish_rack()
+	# These two window lines are just for testing various resolutions
+	# we will likely just let the game be full screen in the end
 	get_window().size = Vector2i(1440, 810)
 	get_window().move_to_center()
 
