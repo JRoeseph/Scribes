@@ -306,20 +306,25 @@ func update_bag_open_state(open: bool):
 	tween.parallel().tween_property(bag_sprite, "scale", new_scale, 0.2)
 
 
+## Runs when the end turn button is pressed
 func _on_end_turn_button_pressed():
 	if verify_valid_play():
 		end_turn()
 
 
+## TODO write the verification logic
+## Checks is the recently play is actually valid
 func verify_valid_play() -> bool:
 	return true
 
 
+## The logic of ending a turn, locks the tiles, calculates score, and replenishes the rack
 func end_turn():
 	board.lock_tiles()
 	replenish_rack()
 
 
+## Replenishes the rack up to the rack_size defined in player
 func replenish_rack():
 	for n in range(player.rack_size - rack_count):
 		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()

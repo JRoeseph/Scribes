@@ -71,6 +71,13 @@ var last_click_position: Vector2 :
 	set(value):
 		last_click_position = value
 
+## The collection of words played on the current turn
+var current_words: Array[Word] :
+	get:
+		return current_words
+	set(value):
+		current_words = value
+
 
 ## Called when the node enters the scene tree for the first time.
 func _ready():
@@ -190,13 +197,49 @@ func change_zoom(zoom_in: float):
 	top_left_pos += offset
 	anim_render_board(top_left_pos)
 
+
 ## Returns the absolute position relative to the window of a specific space
 func get_space_abs_pos(space: BoardSpace) -> Vector2:
 	return space.global_position + Vector2(1, 1) * 90 * current_scale
 
 
+## At the end of the turn, locks the played tiles in place
 func lock_tiles():
+	current_words.clear()
 	for x: int in range(spaces.size()):
 		for y: int in range(spaces[0].size()):
-			if spaces[x][y].placed_tile != null:
+			if spaces[x][y].placed_tile != null && !spaces[x][y].is_locked:
+				calculate_words(x, y, true)
+				calculate_words(x, y, false)
 				spaces[x][y].is_locked = true
+
+
+## During scoring, calculate the tiles that make up newly played words
+func calculate_words(x: int, y: int, is_horizontal: bool):
+	var x_index = x
+	var y_index = y
+	x_index -= 1 if is_horizontal else 0
+	y_index -= 1 if !is_horizontal else 0
+		
+	while x_index > 0  && y_index > 0 && spaces[x_index][y_index].placed_tile != null:
+		if !spaces[x_index][y_index].is_locked:
+			return
+		x_index -= 1 if is_horizontal else 0
+		y_index -= 1 if !is_horizontal else 0
+		
+	x_index += 1 if is_horizontal else 0
+	y_index += 1 if !is_horizontal else 0
+	var new_word = Word.new()
+	new_word.is_horizontal = is_horizontal
+	new_word.start_location = Vector2i(x_index, y_index)
+	while spaces[x_index][y_index].placed_tile != null:
+		new_word.tiles.push_back(spaces[x_index][y_index].placed_tile.base_tile)
+		x_index += 1 if is_horizontal else 0
+		y_index += 1 if !is_horizontal else 0
+	if (current_words.any(func(word): return new_word.equals(word)) ||
+			new_word.tiles.size() < 2):
+		return
+	
+	current_words.push_back(new_word)
+	print(new_word)
+
