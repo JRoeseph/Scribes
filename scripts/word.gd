@@ -32,6 +32,9 @@ func _to_string() -> String:
 	return string_rep + " (" + str(play_value) + ")"
 
 
+## TODO This method doesn't account for adding on to word length
+## We need to figure out a more robust equality method for words 
+## (assuming we continue to care about checking word equality)
 ## Compares multiple word objects for equality
 func equals(other: Word) -> bool:
 	return is_horizontal == other.is_horizontal && start_location == other.start_location
