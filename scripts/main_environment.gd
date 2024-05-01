@@ -159,12 +159,9 @@ func drop_grabbed_tile() -> void:
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	player = Player.new()
-	for n in range(player.rack_size):
-		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()
-		render_tile.init_class(player.pull_tile())
-		rack_tiles.push_back(render_tile)
-		add_child(rack_tiles[n])
-	anim_render_rack()
+	replenish_rack()
+	# These two window lines are just for testing various resolutions
+	# we will likely just let the game be full screen in the end
 	get_window().size = Vector2i(1440, 810)
 	get_window().move_to_center()
 
@@ -232,7 +229,7 @@ func anim_render_rack() -> void:
 
 
 ## Applies tween methods to rack texture
-func anim_render_rack_texture(tween: Tween):
+func anim_render_rack_texture(tween: Tween) -> void:
 	tween.parallel().tween_property(rack_texture, 
 			"position", Vector2(0, (rack.size.y * (1 - tile_scale))), 0.2)
 	tween.parallel().tween_property(rack_texture,
@@ -240,7 +237,7 @@ func anim_render_rack_texture(tween: Tween):
 
 
 ## Applies tween methods to given rack tile
-func anim_render_rack_tile(tile: Node, index: int, tween: Tween):
+func anim_render_rack_tile(tile: Node, index: int, tween: Tween) -> void:
 	var rack_height: float = rack_texture.global_position.y
 	var space_per_tile: float = rack.size.x / rack_count
 	var left_space: float = space_per_tile / 2 - 75
@@ -252,7 +249,7 @@ func anim_render_rack_tile(tile: Node, index: int, tween: Tween):
 
 
 ## Input capture when user input occurs
-func _input(event: InputEvent):
+func _input(event: InputEvent) -> void:
 	if event is InputEventKey && event.physical_keycode == KEY_ESCAPE:
 		get_tree().quit()
 	if is_bag_open:
@@ -265,7 +262,7 @@ func _input(event: InputEvent):
 
 
 ## This function controls how hover_index is impacted by mouse movement
-func on_mouse_motion_event():
+func on_mouse_motion_event() -> void:
 	var mouse_pos: Vector2 = get_viewport().get_mouse_position()
 	if (mouse_pos.y > drag_region.global_position.y && 
 			grabbed_tile != null && !should_snap_to_hover):
@@ -281,17 +278,17 @@ func on_mouse_motion_event():
 
 
 ## This function is called when the player opens their bag to view the menu
-func on_bag_opened():
+func on_bag_opened() -> void:
 	update_bag_open_state(true)
 
 
 ## This function is called when the player closes the bag to view the board
-func on_bag_closed():
+func on_bag_closed() -> void:
 	update_bag_open_state(false)
 
 
 ## This function updates the visibility of UI elements based on if the bag is open or closed
-func update_bag_open_state(open: bool):
+func update_bag_open_state(open: bool) -> void:
 	bag_menu.visible = open
 	if open:
 		bag_menu.render_tiles()
@@ -307,3 +304,31 @@ func update_bag_open_state(open: bool):
 	tween.parallel().tween_property(bag_sprite, "self_modulate", new_alpha, 0.2)
 	tween.parallel().tween_property(bag_sprite, "position", new_position, 0.2)
 	tween.parallel().tween_property(bag_sprite, "scale", new_scale, 0.2)
+
+
+## Runs when the end turn button is pressed
+func _on_end_turn_button_pressed() -> void:
+	if verify_valid_play():
+		end_turn()
+
+
+## TODO write the verification logic
+## Checks is the recently play is actually valid
+func verify_valid_play() -> bool:
+	return true
+
+
+## The logic of ending a turn, locks the tiles, calculates score, and replenishes the rack
+func end_turn() -> void:
+	board.lock_tiles()
+	replenish_rack()
+
+
+## Replenishes the rack up to the rack_size defined in player
+func replenish_rack() -> void:
+	for n in range(player.rack_size - rack_count):
+		var render_tile: BaseRenderTile = BaseRenderTile.instantiate()
+		render_tile.init_class(player.pull_tile())
+		rack_tiles.push_back(render_tile)
+		add_child(render_tile)
+	anim_render_rack()
