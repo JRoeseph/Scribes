@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://c3gb2cctauxn6"]
+[gd_scene load_steps=27 format=3 uid="uid://c3gb2cctauxn6"]
 
 [ext_resource type="Script" path="res://scripts/main_environment.gd" id="1_bi3dh"]
 [ext_resource type="Texture2D" uid="uid://dja40jeowujym" path="res://sprites/Rack.png" id="2_jku88"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dftcce31b8v7h" path="res://sprites/Close_Button.png" id="6_0mca6"]
 [ext_resource type="Script" path="res://scripts/tile_preview.gd" id="7_vbdvc"]
 [ext_resource type="Texture2D" uid="uid://ce3c6gqn5kfd8" path="res://sprites/BagMenuButton.png" id="7_yt2qh"]
+[ext_resource type="Script" path="res://scripts/discard_area.gd" id="10_hn27u"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_oieum"]
 
@@ -463,6 +464,7 @@ offset_left = 1740.0
 offset_top = 50.0
 offset_right = 1920.0
 offset_bottom = 850.0
+script = ExtResource("10_hn27u")
 
 [node name="BaseColor" type="ColorRect" parent="DiscardArea"]
 layout_mode = 0
