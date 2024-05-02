@@ -87,3 +87,8 @@ func pull_tile() -> BaseTile:
 	var return_tile: BaseTile = remaining_bag[rng.randi_range(0, remaining_bag.size() - 1)]
 	remaining_bag.erase(return_tile)
 	return return_tile
+
+
+## Adds tile to the remaining bag
+func add_tile_to_remaining_bag(tile: BaseTile):
+	remaining_bag.push_back(tile)

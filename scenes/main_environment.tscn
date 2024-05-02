@@ -43,7 +43,7 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wn7yq"]
 
-[node name="MainEnvironment" type="Node2D" node_paths=PackedStringArray("rack", "drag_region", "rack_texture", "tile_drag_area", "board", "bag_menu", "bag_sprite")]
+[node name="MainEnvironment" type="Node2D" node_paths=PackedStringArray("rack", "drag_region", "rack_texture", "tile_drag_area", "board", "bag_menu", "bag_sprite", "discard_area")]
 script = ExtResource("1_bi3dh")
 rack = NodePath("Rack")
 drag_region = NodePath("Rack/DragArea")
@@ -52,6 +52,7 @@ tile_drag_area = NodePath("TileDragArea")
 board = NodePath("Board")
 bag_menu = NodePath("BagMenu")
 bag_sprite = NodePath("Bag/BagSprite")
+discard_area = NodePath("DiscardArea")
 
 [node name="Rack" type="Control" parent="."]
 layout_mode = 3
@@ -468,23 +469,23 @@ text = "Font:
 [node name="DiscardArea" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 1740.0
+offset_left = 1750.0
 offset_top = 50.0
 offset_right = 1920.0
-offset_bottom = 850.0
+offset_bottom = 810.0
 script = ExtResource("10_hn27u")
 
 [node name="BaseColor" type="ColorRect" parent="DiscardArea"]
 layout_mode = 0
-offset_right = 180.0
-offset_bottom = 800.0
+offset_right = 170.0
+offset_bottom = 760.0
 color = Color(0.27451, 0.27451, 0.27451, 0.501961)
 
 [node name="TextArea" type="ColorRect" parent="DiscardArea"]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 10.0
-offset_right = 170.0
+offset_right = 160.0
 offset_bottom = 140.0
 color = Color(0.431373, 0.431373, 0.431373, 0.501961)
 
@@ -492,19 +493,19 @@ color = Color(0.431373, 0.431373, 0.431373, 0.501961)
 layout_mode = 0
 offset_left = 10.0
 offset_top = 10.0
-offset_right = 170.0
+offset_right = 160.0
 offset_bottom = 140.0
-theme_override_font_sizes/normal_font_size = 44
+theme_override_font_sizes/normal_font_size = 41
 bbcode_enabled = true
 text = "[center]Discard
 Area:"
 
-[node name="ColorRect" type="ColorRect" parent="DiscardArea"]
+[node name="TileAreaColor" type="ColorRect" parent="DiscardArea"]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 150.0
-offset_right = 170.0
-offset_bottom = 790.0
+offset_right = 160.0
+offset_bottom = 750.0
 color = Color(0.392157, 0.392157, 0.392157, 0.501961)
 
 [connection signal="pressed" from="Bag" to="Bag" method="_on_pressed"]
