@@ -43,6 +43,7 @@ func place_tile(tile: BaseRenderTile) -> void:
 	tile.global_position = original_position
 	tile.tile_sprite.rotation = original_rotation
 	tile.scale = original_scale
+	tile.z_index = 1
 	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
 	tween.parallel().tween_property(tile, "position", Vector2(15, 15), 0.2)
 	tween.parallel().tween_property(tile, "scale", Vector2(1, 1), 0.2)
