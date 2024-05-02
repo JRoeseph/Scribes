@@ -332,6 +332,9 @@ func verify_valid_play() -> bool:
 ## The logic of ending a turn, locks the tiles, calculates score, and replenishes the rack
 func end_turn() -> void:
 	board.lock_tiles()
+	# TODO: The order here determines if we want discarded tiles to be IMMEDIATELY 
+	# drawable again or if it should wait a turn. We also technically need to decide 
+	# if we want them drawable in the same round at all
 	replenish_rack()
 	discard_area.clear_tiles()
 
