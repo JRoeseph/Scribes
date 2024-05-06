@@ -6,7 +6,10 @@ class_name DiscardArea extends Control
 ## there and removing them on turn end
 
 ## Reference to the main environment
-@onready var main_env: MainEnvironment = get_parent()
+@export var main_env: MainEnvironment
+
+## Reference to the color rect of where the tiles go
+@export var tile_area_color: ColorRect
 
 ## Whether or not the space is locked for future grabbing
 var tile_array: Array = [] :
@@ -58,8 +61,10 @@ func render_tiles() -> void:
 	var scale: float = 1.0/(columns as float)
 	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
 	for tile: BaseRenderTile in tile_array:
-		var x_pos: float = curr_col*150*scale+10-(75-75*scale)
-		var y_pos: float = curr_row*150*scale+150-(75-75*scale)
+		var x_pos: float = (curr_col * tile.size.x * scale + tile_area_color.position.x - 
+				(tile.size.x / 2 - tile.size.x / 2 * scale))
+		var y_pos: float = curr_row * tile.size.x * scale + tile.size.x - (tile.size.x / 2 - 
+				tile.size.x / 2 * scale)
 		tween.parallel().tween_property(tile, "position", Vector2(x_pos, y_pos), 0.2)
 		tween.parallel().tween_property(tile, "scale", Vector2(scale, scale), 0.2)
 		tween.parallel().tween_property(tile.tile_sprite, "rotation", 0, 0.2)
@@ -73,11 +78,11 @@ func render_tiles() -> void:
 func clear_tiles() -> void:
 	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
 	for tile: BaseRenderTile in tile_array:
-		tween.parallel().chain().tween_property(tile, "position", Vector2(-1740, -50), 0.2)
+		tween.parallel().chain().tween_property(tile, "global_position", 
+				main_env.bag_sprite.global_position, 0.2)
 		tween.parallel().tween_property(tile, "scale", Vector2(0, 0), 0.2)
 	await tween.finished
 	for tile: BaseRenderTile in tile_array:
 		remove_child(tile)
-		main_env.add_tile_to_remaining_bag(tile.base_tile)
 	tile_array = []
 

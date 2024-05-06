@@ -130,6 +130,50 @@ offset_bottom = 260.0
 theme_override_font_sizes/font_size = 36
 text = "End Turn"
 
+[node name="DiscardArea" type="Control" parent="." node_paths=PackedStringArray("main_env", "tile_area_color")]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1750.0
+offset_top = 50.0
+offset_right = 1920.0
+offset_bottom = 810.0
+script = ExtResource("10_hn27u")
+main_env = NodePath("..")
+tile_area_color = NodePath("TileAreaColor")
+
+[node name="BaseColor" type="ColorRect" parent="DiscardArea"]
+layout_mode = 0
+offset_right = 170.0
+offset_bottom = 760.0
+color = Color(0.27451, 0.27451, 0.27451, 0.501961)
+
+[node name="TextArea" type="ColorRect" parent="DiscardArea"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 160.0
+offset_bottom = 140.0
+color = Color(0.431373, 0.431373, 0.431373, 0.501961)
+
+[node name="RichTextLabel" type="RichTextLabel" parent="DiscardArea"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 160.0
+offset_bottom = 140.0
+theme_override_font_sizes/normal_font_size = 41
+bbcode_enabled = true
+text = "[center]Discard
+Area:"
+
+[node name="TileAreaColor" type="ColorRect" parent="DiscardArea"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 150.0
+offset_right = 160.0
+offset_bottom = 750.0
+color = Color(0.392157, 0.392157, 0.392157, 0.501961)
+
 [node name="BagMenu" type="Control" parent="." node_paths=PackedStringArray("tile_area")]
 visible = false
 layout_mode = 3
@@ -465,48 +509,6 @@ offset_bottom = 300.0
 theme_override_font_sizes/normal_font_size = 40
 text = "Font:
 "
-
-[node name="DiscardArea" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 1750.0
-offset_top = 50.0
-offset_right = 1920.0
-offset_bottom = 810.0
-script = ExtResource("10_hn27u")
-
-[node name="BaseColor" type="ColorRect" parent="DiscardArea"]
-layout_mode = 0
-offset_right = 170.0
-offset_bottom = 760.0
-color = Color(0.27451, 0.27451, 0.27451, 0.501961)
-
-[node name="TextArea" type="ColorRect" parent="DiscardArea"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 160.0
-offset_bottom = 140.0
-color = Color(0.431373, 0.431373, 0.431373, 0.501961)
-
-[node name="RichTextLabel" type="RichTextLabel" parent="DiscardArea"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 160.0
-offset_bottom = 140.0
-theme_override_font_sizes/normal_font_size = 41
-bbcode_enabled = true
-text = "[center]Discard
-Area:"
-
-[node name="TileAreaColor" type="ColorRect" parent="DiscardArea"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 150.0
-offset_right = 160.0
-offset_bottom = 750.0
-color = Color(0.392157, 0.392157, 0.392157, 0.501961)
 
 [connection signal="pressed" from="Bag" to="Bag" method="_on_pressed"]
 [connection signal="pressed" from="EndTurnButton" to="." method="_on_end_turn_button_pressed"]

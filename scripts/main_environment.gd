@@ -47,12 +47,9 @@ var grabbed_tile: BaseRenderTile = null:
 		if rack_tiles.find(value) == -1:
 			add_child(grabbed_tile)
 			hover_space = board.find_hover_space()
-			if hover_space != null:
-				grabbed_tile.global_position = hover_space.global_position
-				anim_grab_tile_to_hover(true)
-			else:
-				grabbed_tile.global_position = discard_area.grab_global_pos
-				anim_grab_tile_to_hover(true)
+			grabbed_tile.global_position = (hover_space.global_position 
+					if hover_space != null else discard_area.grab_global_pos)
+			anim_grab_tile_to_hover(true)
 		else:
 			rack_tiles.erase(value)
 			anim_render_rack()
