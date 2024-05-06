@@ -33,6 +33,9 @@ var BaseRenderTile: PackedScene = load("res://scenes/base_render_tile.tscn")
 ## Reference to the bag sprite
 @export var bag_sprite: Sprite2D
 
+## Reference to the discard area
+@export var discard_area: DiscardArea
+
 ## The tile being dragged by the user. null if none is active
 var grabbed_tile: BaseRenderTile = null:
 	get:
@@ -44,7 +47,8 @@ var grabbed_tile: BaseRenderTile = null:
 		if rack_tiles.find(value) == -1:
 			add_child(grabbed_tile)
 			hover_space = board.find_hover_space()
-			grabbed_tile.global_position = hover_space.global_position
+			grabbed_tile.global_position = (hover_space.global_position 
+					if hover_space != null else discard_area.grab_global_pos)
 			anim_grab_tile_to_hover(true)
 		else:
 			rack_tiles.erase(value)
@@ -141,7 +145,11 @@ func anim_grab_tile_to_hover(is_instant: bool = false) -> void:
 
 ## Called when the left-mouse button is released and grabbed_tile is not null
 func drop_grabbed_tile() -> void:
-	if hover_space == null || hover_space.placed_tile != null:
+	if discard_area.get_rect().has_point(get_viewport().get_mouse_position()):
+		remove_child(grabbed_tile)
+		discard_area.add_tile(grabbed_tile)
+		grabbed_tile = null
+	elif hover_space == null || hover_space.placed_tile != null:
 		var space_per_tile: float = rack.size.x / (rack_tiles.size() + 1)
 		var new_hover_index: int = floori(get_viewport().get_mouse_position().x / space_per_tile)
 		new_hover_index = clamp(new_hover_index, 0, rack_tiles.size())
@@ -321,7 +329,11 @@ func verify_valid_play() -> bool:
 ## The logic of ending a turn, locks the tiles, calculates score, and replenishes the rack
 func end_turn() -> void:
 	board.lock_tiles()
+	# TODO: The order here determines if we want discarded tiles to be IMMEDIATELY 
+	# drawable again or if it should wait a turn. We also technically need to decide 
+	# if we want them drawable in the same round at all
 	replenish_rack()
+	discard_area.clear_tiles()
 
 
 ## Replenishes the rack up to the rack_size defined in player
@@ -332,3 +344,8 @@ func replenish_rack() -> void:
 		rack_tiles.push_back(render_tile)
 		add_child(render_tile)
 	anim_render_rack()
+
+
+## Adds a tile to the bag
+func add_tile_to_remaining_bag(tile: BaseTile):
+	player.add_tile_to_remaining_bag(tile)
