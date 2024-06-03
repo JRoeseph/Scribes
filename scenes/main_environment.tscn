@@ -1,12 +1,14 @@
-[gd_scene load_steps=27 format=3 uid="uid://c3gb2cctauxn6"]
+[gd_scene load_steps=29 format=3 uid="uid://c3gb2cctauxn6"]
 
 [ext_resource type="Script" path="res://scripts/main_environment.gd" id="1_bi3dh"]
 [ext_resource type="Texture2D" uid="uid://dja40jeowujym" path="res://sprites/Rack.png" id="2_jku88"]
 [ext_resource type="Script" path="res://scripts/board.gd" id="3_w5307"]
+[ext_resource type="Texture2D" uid="uid://boxd28q17ipes" path="res://sprites/TileHighlight.png" id="4_gtfli"]
 [ext_resource type="Texture2D" uid="uid://pb5mrfu5rvjk" path="res://sprites/Bag.png" id="4_kkp8s"]
 [ext_resource type="Script" path="res://scripts/bag.gd" id="4_wbxv6"]
 [ext_resource type="Script" path="res://scripts/bag_menu.gd" id="6_0ibpc"]
 [ext_resource type="Texture2D" uid="uid://dftcce31b8v7h" path="res://sprites/Close_Button.png" id="6_0mca6"]
+[ext_resource type="Script" path="res://scripts/score_animation.gd" id="7_1co5e"]
 [ext_resource type="Script" path="res://scripts/tile_preview.gd" id="7_vbdvc"]
 [ext_resource type="Texture2D" uid="uid://ce3c6gqn5kfd8" path="res://sprites/BagMenuButton.png" id="7_yt2qh"]
 [ext_resource type="Script" path="res://scripts/discard_area.gd" id="10_hn27u"]
@@ -54,6 +56,20 @@ bag_menu = NodePath("BagMenu")
 bag_sprite = NodePath("Bag/BagSprite")
 discard_area = NodePath("DiscardArea")
 
+[node name="ScoreAnimation" type="Node" parent="." node_paths=PackedStringArray("board", "tile_highlight", "score_display")]
+script = ExtResource("7_1co5e")
+board = NodePath("../Board")
+tile_highlight = NodePath("../Board/TileHighlightSprite")
+score_display = NodePath("ScoreDisplay")
+
+[node name="ScoreDisplay" type="Label" parent="ScoreAnimation"]
+offset_left = 24.0
+offset_top = 280.0
+offset_right = 307.0
+offset_bottom = 728.0
+theme_override_font_sizes/font_size = 32
+text = "SCORE: 0"
+
 [node name="Rack" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
@@ -85,11 +101,16 @@ offset_right = 1920.0
 offset_bottom = 180.0
 mouse_filter = 2
 
-[node name="Board" type="Node2D" parent="." node_paths=PackedStringArray("main_env", "board_area")]
+[node name="Board" type="Node2D" parent="." node_paths=PackedStringArray("main_env", "board_area", "score_animation")]
 z_index = -1
 script = ExtResource("3_w5307")
 main_env = NodePath("..")
 board_area = NodePath("../BoardArea")
+score_animation = NodePath("../ScoreAnimation")
+
+[node name="TileHighlightSprite" type="Sprite2D" parent="Board"]
+texture = ExtResource("4_gtfli")
+centered = false
 
 [node name="BoardArea" type="Control" parent="."]
 layout_mode = 3

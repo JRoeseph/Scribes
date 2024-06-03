@@ -5,6 +5,9 @@ extends Control
 ## This class captures the grabbed tiles, stores them once placed, will lock them
 ## at the end of a turn, and can release them if not locked
 
+## The length of time the tile snapping animation should take
+@export var animation_length: float = 0.2
+
 ## Reference to the main environment
 @onready var main_env: MainEnvironment = get_parent().main_env
 
@@ -26,6 +29,7 @@ var is_locked: bool = false :
 ## Called when the tile on the BoardSpace is pressed
 func tile_pressed(tile: BaseRenderTile) -> void:
 	if !is_locked:
+		main_env.hover_space = self
 		remove_child(placed_tile)
 		main_env.grabbed_tile = tile
 		placed_tile = null
@@ -45,6 +49,6 @@ func place_tile(tile: BaseRenderTile) -> void:
 	tile.scale = original_scale
 	tile.z_index = 1
 	var tween: Tween = get_tree().create_tween().bind_node(self).set_trans(Tween.TRANS_SINE)
-	tween.parallel().tween_property(tile, "position", Vector2(15, 15), 0.2)
-	tween.parallel().tween_property(tile, "scale", Vector2(1, 1), 0.2)
-	tween.parallel().tween_property(tile.tile_sprite, "rotation", 0, 0.2)
+	tween.parallel().tween_property(tile, "position", Vector2(15, 15), animation_length)
+	tween.parallel().tween_property(tile, "scale", Vector2(1, 1), animation_length)
+	tween.parallel().tween_property(tile.tile_sprite, "rotation", 0, animation_length)

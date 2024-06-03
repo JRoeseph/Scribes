@@ -21,14 +21,27 @@ var tiles: Array[BaseTile]:
 	set(value):
 		tiles = value
 
+## The length of the word
+var length: int:
+	get:
+		return tiles.size()
+	set(value):
+		push_error("Word.length is strictly a read-only value")
+
+## The value of the tiles added together
+var play_value: int:
+	get:
+		var val = 0
+		for tile in tiles:
+			val += tile.value
+		return val
+
 
 ## string override to print words for debugging purposes
 func _to_string() -> String:
 	var string_rep = ""
-	var play_value = 0
 	for tile in tiles:
 		string_rep += tile.character
-		play_value += tile.value
 	return string_rep + " (" + str(play_value) + ")"
 
 

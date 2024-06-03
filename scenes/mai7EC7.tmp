@@ -1,0 +1,52 @@
+[gd_scene load_steps=29 format=3 uid="uid://c3gb2cctauxn6"]
+
+[ext_resource type="Script" path="res://scripts/main_environment.gd" id="1_bi3dh"]
+[ext_resource type="Texture2D" uid="uid://dja40jeowujym" path="res://sprites/Rack.png" id="2_jku88"]
+[ext_resource type="Script" path="res://scripts/board.gd" id="3_w5307"]
+[ext_resource type="Texture2D" uid="uid://boxd28q17ipes" path="res://sprites/TileHighlight.png" id="4_gtfli"]
+[ext_resource type="Texture2D" uid="uid://pb5mrfu5rvjk" path="res://sprites/Bag.png" id="4_kkp8s"]
+[ext_resource type="Script" path="res://scripts/bag.gd" id="4_wbxv6"]
+[ext_resource type="Script" path="res://scripts/bag_menu.gd" id="6_0ibpc"]
+[ext_resource type="Texture2D" uid="uid://dftcce31b8v7h" path="res://sprites/Close_Button.png" id="6_0mca6"]
+[ext_resource type="Script" path="res://scripts/score_animation.gd" id="7_1co5e"]
+[ext_resource type="Script" path="res://scripts/tile_preview.gd" id="7_vbdvc"]
+[ext_resource type="Texture2D" uid="uid://ce3c6gqn5kfd8" path="res://sprites/BagMenuButton.png" id="7_yt2qh"]
+[ext_resource type="Script" path="res://scripts/discard_area.gd" id="10_hn27u"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_oieum"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hkmqt"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_d0w72"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4l8b8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_b7ahm"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1dw2l"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_h6451"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dc02j"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_i8cg8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ojmtu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5lcqv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fnmlk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vuuyc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3f27y"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qic63"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wn7yq"]
+
+[node name="MainEnvironment" type="Node2D"]
+script = ExtResource("1_bi3dh")
+rack = Object(Control,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":0,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"material":null,"use_parent_material":false,"clip_contents":false,"custom_minimum_size":Vector2(0, 0),"layout_direction":0,"layout_mode":3,"anchors_preset":0,"anchor_left":0.0,"anchor_top":0.0,"anchor_right":0.0,"anchor_bottom":0.0,"offset_left":0.0,"offset_top":900.0,"offset_right":1920.0,"offset_bottom":1080.0,"grow_horizontal":1,"grow_vertical":1,"rotation":0.0,"scale":Vector2(1, 1),"pivot_offset":Vector2(0, 0),"size_flags_horizontal":1,"size_flags_vertical":1,"size_flags_stretch_ratio":1.0,"auto_translate":true,"localize_numeral_system":true,"tooltip_text":"","focus_neighbor_left":NodePath(""),"focus_neighbor_top":NodePath(""),"focus_neighbor_right":NodePath(""),"focus_neighbor_bottom":NodePath(""),"focus_next":NodePath(""),"focus_previous":NodePath(""),"focus_mode":0,"mouse_filter":2,"mouse_force_pass_scroll_events":true,"mouse_default_cursor_shape":0,"shortcut_context":null,"theme":null,"theme_type_variation":&"","script":null)
+
+drag_region = Object(Control,"_import_path":NodePath(""),"unique_name_in_owner":false,"process_mode":0,"process_priority":0,"process_physics_priority":0,"process_thread_group":0,"editor_description":"","visible":true,"modulate":Color(1, 1, 1, 1),"self_modulate":Color(1, 1, 1, 1),"show_behind_parent":false,"top_level":false,"clip_children":0,"light_mask":1,"visibility_layer":1,"z_index":0,"z_as_relative":true,"y_sort_enabled":false,"texture_filter":0,"texture_repeat":0,"materia

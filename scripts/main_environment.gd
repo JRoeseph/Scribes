@@ -332,6 +332,10 @@ func end_turn() -> void:
 	# TODO: The order here determines if we want discarded tiles to be IMMEDIATELY 
 	# drawable again or if it should wait a turn. We also technically need to decide 
 	# if we want them drawable in the same round at all
+	var turn_score : int = 0
+	for word in board.current_words:
+		turn_score += word.play_value
+	print("TURN SCORE: " + str(turn_score))
 	replenish_rack()
 	discard_area.clear_tiles()
 
