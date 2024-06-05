@@ -16,6 +16,9 @@ const ZOOM_FACTOR_MAX: int = 7
 ## Reference to the area that defines the limits of the board
 @export var board_area: Node
 
+## Reference to the scoring animation manager
+@export var score_animation: ScoreAnimation
+
 ## The 2d array that stores the BoardSpaces
 var spaces: Array = [] :
 	get:
@@ -116,6 +119,8 @@ func anim_render_board(starting_pos: Vector2) -> void:
 					Vector2(starting_pos.x + 180 * current_scale * x, 
 							starting_pos.y + 180 * current_scale * y), 
 					0.2)
+	tween.parallel().tween_property(score_animation.tile_highlight, "scale", 
+			Vector2(current_scale, current_scale), 0.2)
 
 
 ## Returns the board space the mouse cursor is over, returns null if none
@@ -206,22 +211,22 @@ func get_space_abs_pos(space: BoardSpace) -> Vector2:
 ## At the end of the turn, locks the played tiles in place
 func lock_tiles() -> void:
 	current_words.clear()
+	score_animation.start_turn_scoring()
 	for x: int in range(spaces.size()):
 		for y: int in range(spaces[0].size()):
 			if spaces[x][y].placed_tile != null && !spaces[x][y].is_locked:
-				calculate_words(x, y, true)
-				calculate_words(x, y, false)
+				await calculate_words(x, y, true)
+				await calculate_words(x, y, false)
 				spaces[x][y].is_locked = true
+	score_animation.end_turn_scoring()
 
 
 ## During scoring, calculate the tiles that make up newly played words
-func calculate_words(x: int, y: int, is_horizontal: bool) -> void:
-	var x_index = x
-	var y_index = y
+func calculate_words(x_index: int, y_index: int, is_horizontal: bool) -> void:
 	x_index -= 1 if is_horizontal else 0
 	y_index -= 1 if !is_horizontal else 0
 		
-	while x_index > 0  && y_index > 0 && spaces[x_index][y_index].placed_tile != null:
+	while x_index >= 0 && y_index >= 0 && spaces[x_index][y_index].placed_tile != null:
 		if !spaces[x_index][y_index].is_locked:
 			return
 		x_index -= 1 if is_horizontal else 0
@@ -232,7 +237,8 @@ func calculate_words(x: int, y: int, is_horizontal: bool) -> void:
 	var new_word = Word.new()
 	new_word.is_horizontal = is_horizontal
 	new_word.start_location = Vector2i(x_index, y_index)
-	while spaces[x_index][y_index].placed_tile != null:
+	while (x_index < spaces.size() && y_index < spaces[0].size() &&
+			spaces[x_index][y_index].placed_tile != null):
 		new_word.tiles.push_back(spaces[x_index][y_index].placed_tile.base_tile)
 		x_index += 1 if is_horizontal else 0
 		y_index += 1 if !is_horizontal else 0
@@ -241,5 +247,5 @@ func calculate_words(x: int, y: int, is_horizontal: bool) -> void:
 		return
 	
 	current_words.push_back(new_word)
+	await score_animation.animate_word_scoring(new_word)
 	print(new_word)
-
